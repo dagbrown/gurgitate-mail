@@ -41,16 +41,18 @@ module Gurgitate
         # spooldir::
         #   The location of the mail spools directory.
         def initialize(input=nil,spooldir="/var/spool/mail",&block)
-            @passwd=Etc.getpwuid
-            @homedir=@passwd.dir;
-            @maildir=@passwd.dir+"/Mail"
-            @logfile=@passwd.dir+"/.gurgitate.log"
-            @sendmail="/usr/lib/sendmail"
-            @actiontaken=false
-            @spooldir=spooldir
-            @spoolfile=@spooldir+"/"+Etc.getlogin()
+            @passwd    = Etc.getpwuid
+            @homedir   = @passwd.dir;
+            @maildir   = File.join(@passwd.dir,"Mail")
+            @logfile   = File.join(@passwd.dir,".gurgitate.log")
+            @sendmail  = "/usr/lib/sendmail"
+            @spooldir  = spooldir
+            @spoolfile = File.join(@spooldir,@passwd.name )
 
-            input_text=""
+            # @spoolfile=@spooldir+"/"+Etc.getlogin()
+
+            @actiontaken = false
+            input_text = ""
             input.each do |l| input_text << l end
             super(input_text)
             instance_eval(&block) if block_given?
