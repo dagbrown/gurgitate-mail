@@ -12,7 +12,7 @@ clean:
 	-rm -f pod2htm*~~
 	-rm -rf doc
 
-tarball: $(TARGETS) INSTALL CHANGELOG
+tarball: $(TARGETS) INSTALL CHANGELOG install.rb
 	cd .. && tar zcvf $(TARBALL) \
         gurgitate-mail/INSTALL \
         gurgitate-mail/install.rb \
