@@ -183,7 +183,7 @@ module Gurgitate
             end then
                 return HeaderBag.new(names.collect { |name| 
                         @headers[name] 
-                    }.flatten)
+                    }.flatten.delete_if { |e| e == nil } )
             else
                 return nil
             end
