@@ -1,3 +1,17 @@
+1.4:
+ I seem to have given up on minor changes.  More big stuff.
+
+ - Changed the API!  (WARNING WARNING WARNING)  Now Message#to_s
+   returns the email message without the "From " line.  You get that
+   with Message#to_mbox
+
+ - Broke the code into lots of little pieces instead of the one great
+   big file.  I hope this makes it slightly easier for people to
+   understand--it certainly made it easier for me
+
+ - Added maildir delivery!  Plus a sort of mechanism for delivering to
+   various kinds of mailboxes.
+
 1.3:
  
  Some pretty big things here (in my opinion), so I figured it was
