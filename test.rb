@@ -386,7 +386,7 @@ EOF
         assert_equal("anotherfromline@example.com",h.from,
             "Envelope from correctly changed")
         assert_match(/^From anotherfromline@example.com #{t}/,
-            h.to_s, "Envelope from changed in finished product")
+            h.to_mbox, "Envelope from changed in finished product")
     end
 
     def test_match_multiple_headers

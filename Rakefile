@@ -19,8 +19,17 @@
 
 include RakeTools
 
-Targets = %w{gurgitate-mail.rb gurgitate-mail gurgitate-mail.html
-             gurgitate-mail.man README}
+Modules =  %w{gurgitate/deliver.rb
+             gurgitate/headers.rb 
+             gurgitate/mailmessage.rb
+             gurgitate/deliver/maildir.rb
+             gurgitate/deliver/mbox.rb}
+
+Targets = %w{gurgitate-mail.rb
+             gurgitate-mail
+             gurgitate-mail.html
+             gurgitate-mail.man
+             README} + Modules
 
 Webpage=ENV["HOME"]+"/public_html/software/gurgitate-mail"
 Version=File.open("VERSION").read.chomp
@@ -88,6 +97,9 @@ end
 
 file("gurgitate-mail.rb" => ["gurgitate-mail.RB"]) { |t| ruby_compile(t) }
 file("gurgitate-mail" => ["gurgitate.rb"]) { |t| ruby_compile(t) }
+Modules.map do |modname|
+    file(modname => [modname.sub(/.rb$/,".RB")]) do |t| ruby_compile(t) end
+end
 
 file "README" => "gurgitate-mail.text" do |t|
     t.source=t.prerequisites[0]
