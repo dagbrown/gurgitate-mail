@@ -79,6 +79,14 @@ module Gurgitate
 
 #========================================================================
 
+    class HeaderBag < Array
+        def =~(regex)
+            inject(false) do |y,x|
+                y or ( ( x =~ regex ) != nil )
+            end
+        end
+    end
+
     # A slightly bigger class for all of a message's headers
     class Headers
 
@@ -112,7 +120,7 @@ module Gurgitate
                     @lastheader << h
                 else
                     header=Header.new(h)
-                    @headers[header.name]=[] if @headers[header.name]==nil;
+                    @headers[header.name] ||= HeaderBag.new;
                     @headers[header.name].push(header)
                     @lastheader=header
                 end
@@ -130,7 +138,9 @@ module Gurgitate
                 if self["Return-Path"] != nil then
                     fromregex.match(self["Return-Path"][0].contents);
                 else
-                    fromregex.match(self["From"][0].contents);
+                    if self["From"] != nil then
+                        fromregex.match(self["From"][0].contents);
+                    end
                 end
                 address_candidate=$+
 
@@ -165,23 +175,36 @@ module Gurgitate
             end
         end
 
-        # Grab the header with name +name+
-        # name:: The name of the header.
-        def [](name); return @headers[name]; end
+        # Grab the headers with names +names+
+        # names:: The names of the header.
+        def [](*names)
+            if names.inject(false) do |accum,name| 
+                accum or @headers.has_key? name
+            end then
+                return HeaderBag.new(names.collect { |name| 
+                        @headers[name] 
+                    }.flatten)
+            else
+                return nil
+            end
+        end
 
         # Set the header named +name+ to +value+
         # name:: The name of the header.
         # value:: The new value of the header.
         def []=(name,value)
             @headers_changed = true
-            @headers[name]=[Header.new(name,value)]
+            @headers[name]=HeaderBag.new([Header.new(name,value)])
         end
 
-        # Who the message is from
+        # Who the message is from (the envelope from)
         def from
             return @from || ""
         end
 
+        # Change the envelope from line to whatever you want.  This might
+        # not be particularly neighborly, but oh well.
+        # newfrom:: An email address
         def from=(newfrom) 
             @from=newfrom
             @unix_from="From "+self.from+" "+Time.new.to_s;
@@ -256,6 +279,9 @@ module Gurgitate
     
         # Returns the UNIX "from" line
         def from; @headers.from; end
+
+        # Returns all the candidates for a "to" line
+        def to; @headers["To","Cc"]; end
 
         # Returns the formatted mail message
         def to_s; @headers.to_s+@body; end

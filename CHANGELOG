@@ -1,6 +1,22 @@
+1.3:
+ 
+ Some pretty big things here (in my opinion), so I figured it was
+ worth making it a 1.3 release instead of 1.2.2.
+
+ - Added the ability to say
+       headers["From", "Subject", "Cc"] =~ /hi there/
+   in your .gurgitate-rules, and have it do the right thing.
+
+ - Added "to" so you can now say
+      if to =~ /mailing-list/ then ...;end
+   instead of the cumbersome 
+      if headers.matches(["To","Cc"],/mailing-list/) then ...; end
+   syntax which I just plain ol' hated.
+
  - Made it possible to change the contents of headers.
 
- - Made the man page not claim to be user-contributed Perl documentation :-)
+ - Made the man page not claim to be user-contributed Perl
+   documentation :-)
 
  - Made it deal correctly with headers that have tabs between the colon
    and the data, instead of spaces (bug #154).

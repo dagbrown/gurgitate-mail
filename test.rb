@@ -388,6 +388,22 @@ EOF
         assert_match(/^From anotherfromline@example.com #{t}/,
             h.to_s, "Envelope from changed in finished product")
     end
+
+    def test_match_multiple_headers
+        m = <<'EOF'
+From fromline@example.com Sat Oct 25 12:58:31 PDT 2003
+From: fromline@example.com
+To: toline@example.com
+Subject: Subject line
+EOF
+        h=Gurgitate::Headers.new(m)
+        assert_equal(true,h["From","To"] =~ /fromline@example.com/,
+            "headers contains fromline")
+        assert_equal(true,h["From","To"] =~ /toline@example.com/,
+            "headers contains toline")
+        assert_equal(false,h["Rabbit"] =~ /nonexistent/,
+            "Asking for a nonexistent header")
+    end
 end
 
 def runtests

@@ -95,6 +95,11 @@ for testing whether both "To:" and "Cc:" headers match.
 Returns the envelope "from" address of the email message.  Note
 that this is the same as the bare "from".
 
+=item to
+
+Returns a HeaderBag (a kind of array) with the contents of the
+"To" and the "Cc" headers.
+
 =item to_s
 
 As per Ruby convention, returns all the headers as a C<String> object.
@@ -123,6 +128,38 @@ This pipes the message through C<program> and returns a new
 Gurgitate object containing the filtered mail.  (This is handy
 for external filters which modify email like, for example,
 SpamAssassin, which adds a spam-score header.)
+
+=item headers
+
+This returns the headers as an object of their own.  This object
+has its own methods:
+
+=over 5
+
+=item headers[*headernames]
+
+This returns a HeaderBag (a subclass of array) containing the
+headers you asked for.  You can then use the =~ operator on this
+result to match the RHS regex with everything in the HeaderBag.
+
+You can change a header's value with C<headers[name]=newvalue>.
+
+=item headers.match(name,regex)
+
+Matches the header with the name "name" against the regex.  This
+is the same as headers[name] =~ /regex/.
+
+=item headers.matches(names,regex)
+
+Matches the headers with the names "names" against the regex.
+This is the same as headers[*names] =~ /regex/.
+
+=item headers.from
+
+Returns the envelope from.  You can change this with
+C<headers.from=newaddress> too.
+
+=back
 
 =item return
 
@@ -163,6 +200,22 @@ Any email with a To: or Cc: line of "sysadmin" is saved to a
 "sysadmin" folder.  Useful for people with multiple role accounts
 redirected to their address.
 
+    if headers["Subject"] =~ /\[SPAM\]/ then
+        save("=spam")
+        return
+    end
+
+This is a different syntax for matching patterns against headers.
+You can also match multiple headers in the square brackets.
+
+    if headers["Subject","Keywords"] =~ /a bad word/ then
+        save("=swearing")
+        return
+    end
+
+Searches for "a bad word" in the Subject and Keywords headers, and
+if it's there, saves the email in the "swearing" folder.
+
     if headers.matches(["To","Cc"],"mailing-list@example.com") then
         pipe("|rcvstore +mailing-list")
         return
@@ -170,6 +223,19 @@ redirected to their address.
 
 Any email to a mailing list is piped through "rcvstore" to store
 it into an MH folder.
+
+That
+
+    headers.matches(["To","Cc"],/regex/)
+
+idiom happens often enough that there's a shorthand for it:
+
+    if to =~ /mailing-list@example.com/ then
+        pipe("|rcvstore +mailing-list")
+        return
+    end
+
+Pipes the mail to the mailing list through "rcvstore".
 
 =head1 ADVANCED EXAMPLES
 
