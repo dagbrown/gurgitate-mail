@@ -1,0 +1,2 @@
+To install gurgitate-mail, simply run the "install.rb" script:
+    ruby install.rb

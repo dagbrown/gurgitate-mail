@@ -1,0 +1,33 @@
+1.1.1 - maintenance release
+
+    Fixed the regexes for my own email addresses--they had backslashes
+    in strange place, causing people to ask odd questions.
+
+    Fixed a typo (thanks to Tom Wadlow)--I was using an undefined
+    local variable "sendmail" instead of a class variable "@sendmail".
+
+1.1
+
+    Implemented Pavel Kolar's suggestion that if you filter email
+    through an external program, you might want the results of that,
+    instead of just a return code.
+
+    Added a default value to the Gurgitate initializer parameter.
+
+    Added an "install.rb" script to install the script and library
+    files into their proper locations.
+
+    Pulled the "Gurgitate" class and friends out into a separate file,
+    and made "gurgitate-mail" into a tiny script which does a
+    "require" to pull the gurgitate-mail stuff in.  This should make
+    it easier to extend in the future.
+
+    Added this file to the distribution. :-)
+
+1.0.1 - maintenance release
+
+    Small code cleanup--changed some accessors to use attr_*.
+
+1.0
+
+    Initial release of gurgitate-mail

@@ -1,0 +1,278 @@
+=head1 NAME
+
+gurgitate-mail - an easy-to-use mail filter
+
+=head1 SYNOPSIS
+
+gurgitate-mail
+
+=head1 DESCRIPTION
+
+C<gurgitate-mail> is a program which reads your mail and filters
+it according to the F<.gurgitate-rules.rb> file in your home
+directory.  The configuration file uses Ruby syntax and is thus
+quite flexible.
+
+It's generally invoked either through your F<.forward> file:
+
+    "|/path/to/gurgitate-mail"
+
+Or through your F<.procmailrc> file:
+
+    :0:
+    | /path/to/gurgitate-mail
+
+(Future versions will, hopefully, be usable as a local delivery
+agent; a drop-in replacement for "deliver" or "procmail".)
+
+=head1 CONFIGURATION FILE
+
+F<.gurgitate-rules> is a series of Ruby statements, with the
+following methods and variables available:
+
+=head2 Variables
+
+=over 5
+
+=item from
+
+This contains the envelope "from" address of the email message.
+(Note that this isn't necessarily the same as the contents of the
+"From:" header)
+
+=item headers
+
+This is an object containing the headers of the message.  There
+are several methods that come with this object:
+
+=item body
+
+This contains the body of the email message.  As of yet, there's
+nothing really interesting which you can do with this, apart from
+assigning to it; you can rewrite the body of an email message this
+way.  Dealing with attachments is planned for a future release of
+C<gurgitate-mail>.
+
+=item maildir
+
+The directory which contains the folders, used by the C<save>
+method when you specify a folder as "=F<folder>" (like Elm).
+Defaults to "$HOME/Mail".
+
+=item homedir
+
+Your home directory.  Read-only.
+
+=item logfile
+
+The location of the C<gurgitate-mail> logfile.  If set to C<nil>,
+then no logging is done.  Defaults to "$HOME/.gurgitate.log".
+
+=item sendmail
+
+The location of the C<sendmail> program.  Used by the C<forward>
+method.  Defaults to "/usr/lib/sendmail".
+
+=item spoolfile
+
+The location of the mail spool.  Read-only.
+
+=back
+
+=head2 Methods
+
+=over 5
+
+=item matches(name(s),regex)
+
+Returns C<true> if the header C<name> matches the regular
+expression C<regex>.  If C<name> is an array of header names, then
+it returns true if at least one of the headers matches.  Useful
+for testing whether both "To:" and "Cc:" headers match.
+
+=item from
+
+Returns the envelope "from" address of the email message.  Note
+that this is the same as the bare "from".
+
+=item to_s
+
+As per Ruby convention, returns all the headers as a C<String> object.
+
+=item save(mailbox)
+
+This saves the message to a mailbox.  You can specify the mailbox
+as a word with an = sign in front of it, in which case it puts it
+into C<maildir>.  If you don't use the =F<name> format, then you
+need to specify an absolute pathname.  If it can't write the
+message to the file you request it to, it'll attempt to write it
+to C<spoolfile>.
+
+=item forward(address)
+
+This forwards the email message to another email address.
+
+=item pipe(program)
+
+This pipes the message through C<program>.  C<pipe> returns the
+exit code of the program that the message was piped through.
+
+=item filter(program)
+
+This pipes the message through C<program> and returns a new
+Gurgitate object containing the filtered mail.  (This is handy
+for external filters which modify email like, for example,
+SpamAssassin, which adds a spam-score header.)
+
+=item return
+
+This tells C<gurgitate-mail> to stop processing the email message.
+If you don't use C<return>, then C<gurgitate-mail> will continue
+processing the same mail again with the next rule.  If there isn't
+a C<return> at the end of F<gurgitate-rules.rb>, then
+C<gurgitate-mail> will save the email message in the normal mail
+spool.
+
+=item log(message)
+
+This writes a log message to the log file.
+
+=back
+
+=head1 SIMPLE EXAMPLES
+
+Here are some examples of C<gurgitate-mail> rules, with
+explanations:
+
+    if from =~ /ebay.com/ then save("=ebay"); return; end
+
+Any email from eBay (automatic end-of-auction notifications, for
+example, and outbid notices) gets filed into the "ebay" folder.
+
+    if from =~ /root@/ then save("=root"); return; end
+
+Any email from root (at any host) gets filed into a special
+folder.  Useful for sysadmins monitoring crontab email.
+
+    if headers.matches(["To","Cc"],"webmaster@") then
+        save("=webmaster")
+        return
+    end
+
+Any email with a To: or Cc: line of "sysadmin" is saved to a
+"sysadmin" folder.  Useful for people with multiple role accounts
+redirected to their address.
+
+    if headers.matches(["To","Cc"],"mailing-list@example.com") then
+        pipe("|rcvstore +mailing-list")
+        return
+    end
+
+Any email to a mailing list is piped through "rcvstore" to store
+it into an MH folder.
+
+=head1 ADVANCED EXAMPLES
+
+Here are some slightly more clever examples to give you an idea
+of what you can do with C<gurgitate-mail>.  Let's suppose you have
+an email whitelist in a file called F<$HOME/.friends>, so you can
+determine whether some email is likely to be spam or not.
+
+Then if someone on your whitelist sends you email, then you
+automatically save that into the "inbox" folder:
+
+    friends=homedir+"/.friends"
+    if FileTest.exists?(friends) and FileTest.readable?(friends) then
+        File.new(friends).each do |friend|
+            if from =~ friend.chomp then
+                log "Mail from friend "+friend.chomp
+                save("=inbox")
+                return
+            end
+        end
+    end
+
+Okay, if someone sends you email, and it's addressed specifically
+to you (and gurgitate-mail hasn't caught it in another form already),
+then it might or might not be spam: put it into a "grey" folder:
+
+    my_addresses= [ /me@example\.com/i,
+                    /me@example\.org/i,
+                    /me@example\.net/i];  # I have three email addresses
+    my_addresses.each do |addr|
+        if headers.matches(["To","Cc"],addr) then
+            save("=possibly-not-spam")
+            return
+        end
+    end
+
+And after that, if it's not from someone you know, and it's not
+addressed to your email address either, then it's probably save to
+assume that it's spam:
+
+    save("=spam")
+    return
+
+This can be improved by using a Bayesian filter, though; for
+example, Eric Raymond's L<bogofilter> program
+(http://bogofilter.sourceforge.net) can be automatically trained
+and used with the help of the white/grey/black distinctions.
+Taking the example above, I'll adjust it by adding in calls to
+bogofilter:
+
+    friends=homedir+"/.friends"
+    if FileTest.exists?(friends) and FileTest.readable?(friends) then
+        File.new(friends).each do |friend|
+            if from =~ friend.chomp then
+                log "Mail from friend "+friend.chomp
+                pipe("bogofilter -h")  # <-- LINE ADDED HERE
+                save("=inbox")
+                return
+            end
+        end
+    end
+
+C<bogofilter -h> trains L<bogofilter> that mail from whitelisted-people 
+is not to be considered spam.  Okay, at the end of the
+.gurgitate-rules, change
+
+    save("=spam")
+    return
+
+to
+
+    save("=spam")
+    pipe("bogofilter -s")
+    return
+
+This trains C<bogofilter> that anything which doesn't pass the
+rest of the filter should be considered spam.  Now for the
+interesting bit: Change the bit between these to use "bogofilter"
+to decide whether email is to be considered spam or not:
+
+    my_addresses= [ /me@example\.com/i,
+                    /me@example\.org/i,
+                    /me@example\.net/i];  # I have three email addresses
+    my_addresses.each do |addr|
+        if headers.matches(["To","Cc"],addr) then
+            if pipe("bogofilter")==1
+            then
+                log("bogofilter suspects it might not be spam")
+                save("=possibly-not-spam")
+            else
+                log("bogofilter thinks it's probably spam")
+                save("=spam")
+            end
+            return
+        end
+    end
+
+C<bogofilter> has an exit code of "1" if it thinks the message is
+not spam, and "0" if it thinks the message is spam.
+
+Hopefully this should give you an idea of the kinds of things that
+you can use C<bogofilter> for.
+
+=head1 AUTHOR
+
+Dave Brown <gurgitate-mail@dagbrown.com>
