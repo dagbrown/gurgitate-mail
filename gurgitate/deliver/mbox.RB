@@ -18,10 +18,10 @@ module Gurgitate
                 if File.stat(mailbox).file? then 
                     return MBox
                 else
-                    unless File.exists? mailbox
-                        return MBox
-                    else
+                    if File.exists? mailbox
                         return nil
+                    else
+                        return MBox
                     end
                 end
             end
