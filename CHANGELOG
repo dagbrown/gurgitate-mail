@@ -1,4 +1,6 @@
-    Fixed some header handling which was kind of, er, broken.
+1.2:
+
+ -  Fixed some header handling which was kind of, er, broken.
     Specifically, I'd get an exception on a header which looked
     like:
 
@@ -10,14 +12,14 @@
     filter to blow up just because it's given crappy input.
 
 
-    Made the comments more rdoc-friendly.
+ -  Made the comments more rdoc-friendly.
 
     Fixed the handling of multi-line headers--it was getting it
     RONG RONG RONG (but I've probably implemented this RONG RONG
     RONG too).
 
 
-    Made it so that as well as saying 
+ -  Made it so that as well as saying 
                                 
     g=Gurgitate::Gurgitate.new(filehandle)
     if g.head =~ /evil@bad.com/ then delete end
@@ -31,57 +33,57 @@
     Which gives you another place to put your .gurgitate-rules.
 
 
-    Made install.rb work as both a script as a library, because
+ -  Made install.rb work as both a script as a library, because
     I switched to using rake to build things, rather than make.
 
 
-    Made it canonicalize headers to a standard capitalization,
+ -  Made it canonicalize headers to a standard capitalization,
     because some SMTP client (*cough*virus*cough*) is incorrectly
     sending out all-uppercase headers.
 
-1.1.3
+1.1.3:
 
-    Put the whole thing into a big module, and added some extra
+ -  Put the whole thing into a big module, and added some extra
     comments to make it more rdoc-friendly.  You shouldn't need to
     change your .gurgitate-rules.rb if you use it like that, but
     if you use it as a module, you'll need to prefix 'Gurgitate::'
     to your Gurgitate object construction.
 
-1.1.2 - maintenance release
+1.1.2: maintenance release
 
-    Changed gurgitate-mail so that it compiles cleanly under Ruby 1.8,
+  - Changed gurgitate-mail so that it compiles cleanly under Ruby 1.8,
     and made it work with no warnings.
 
-1.1.1 - maintenance release
+1.1.1: maintenance release
 
-    Fixed the regexes for my own email addresses--they had backslashes
+  - Fixed the regexes for my own email addresses--they had backslashes
     in strange place, causing people to ask odd questions.
 
     Fixed a typo (thanks to Tom Wadlow)--I was using an undefined
     local variable "sendmail" instead of a class variable "@sendmail".
 
-1.1
+1.1:
 
-    Implemented Pavel Kolar's suggestion that if you filter email
+  - Implemented Pavel Kolar's suggestion that if you filter email
     through an external program, you might want the results of that,
     instead of just a return code.
 
-    Added a default value to the Gurgitate initializer parameter.
+  - Added a default value to the Gurgitate initializer parameter.
 
-    Added an "install.rb" script to install the script and library
+  - Added an "install.rb" script to install the script and library
     files into their proper locations.
 
-    Pulled the "Gurgitate" class and friends out into a separate file,
+  - Pulled the "Gurgitate" class and friends out into a separate file,
     and made "gurgitate-mail" into a tiny script which does a
     "require" to pull the gurgitate-mail stuff in.  This should make
     it easier to extend in the future.
 
-    Added this file to the distribution. :-)
+  - Added this file to the distribution. :-)
 
-1.0.1 - maintenance release
+1.0.1: maintenance release
 
-    Small code cleanup--changed some accessors to use attr_*.
+  - Small code cleanup--changed some accessors to use attr_*.
 
-1.0
+1.0:
 
-    Initial release of gurgitate-mail
+  - Initial release of gurgitate-mail
