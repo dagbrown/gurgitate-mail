@@ -8,16 +8,20 @@ module Gurgitate
         def Install.install()
             include Config
 
+            Package = "gurgitate-mail"
             version = CONFIG["MAJOR"] + "." + CONFIG["MINOR"]
             sitedir = CONFIG["sitedir"]
             bindir  = CONFIG["bindir"]
+            mandir  = CONFIG["mandir"] + "/man1"
             dest    = "#{sitedir}/#{version}"
 
-            print "Installing gurgitate-mail.rb in #{dest}...\n"
-            File.install("gurgitate-mail.rb", dest, 0644)
+            print "Installing #{Package}.rb in #{dest}...\n"
+            File.install("${Package}.rb", dest, 0644)
 
-            print "Installing gurgitate-mail in #{bindir}...\n"
+            print "Installing ${Package}.1 in #{mandir}...\n"
+            File.install("${Package}.man","#{mandir}/#{Package}.1", 0644)
 
+            print "Installing #{Package} in #{bindir}...\n"
             # Not so simple; need to put in the shebang line
             from_f=File.open("gurgitate-mail")
             to_f=File.open("#{bindir}/gurgitate-mail","w")
