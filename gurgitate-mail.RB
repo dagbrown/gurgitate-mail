@@ -36,17 +36,16 @@ module Gurgitate
         # header::
         #   The text of the email-message header
         def initialize(header)
-            if(header =~ /: /) then
+            if(header =~ /^[a-zA-Z][a-zA-Z0-9-]*:/) then
                 (name,contents)=header.split(/: /,2)
 
                 raise IllegalHeader, "Empty name" \
                     if (name == "" or name == nil)
-                raise IllegalHeader, "Bad header syntax: #{name}" \
-                    if contents == nil
+                contents="" if contents == nil
 
                 @@lastname=name
             else
-                raise IllegalHeader, "Bad header syntax: no colon"
+                raise IllegalHeader, "Bad header syntax: no colon in #{header}"
             end
 
             @name=capitalize_words(name)
