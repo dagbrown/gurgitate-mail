@@ -17,8 +17,15 @@ module Gurgitate
 
         # Creates a Header object with the header's text in
         # <header>
+        def capitalize_words(s)
+            return s.split(/-/).map { |w| w.capitalize }.join("-")
+        end
+
         def initialize(header)
-            (@name,@contents)=header.split(/: /,2)
+            (name,contents)=header.split(/: /,2)
+
+            @name=capitalize_words(name)
+            @contents=contents
         end
 
         # Matches a header to a regex
@@ -36,6 +43,7 @@ module Gurgitate
     # A slightly bigger class for all of a message's headers
     #========================================================================
     class Headers
+
         # Creates a Headers object with the text of the headers in
         # <headertext>
         def initialize(headertext)
