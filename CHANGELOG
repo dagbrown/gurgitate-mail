@@ -4,6 +4,8 @@
    has no contents.  (Aren't those supposed to be illegal?  Regardless,
    I have to deal with whatever turns up, be it kosher or no)
 
+ - Made its installer also politely install a man page
+
 1.2:
 
  -  Fixed some header handling which was kind of, er, broken.
