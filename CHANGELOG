@@ -1,3 +1,6 @@
+    Made install.rb work as both a script as a library, because
+    I switched to using rake to build things, rather than make.
+
     Made it canonicalize headers to a standard capitalization,
     because some SMTP client (ahem) is incorrectly sending out
     all-uppercase headers.
