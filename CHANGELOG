@@ -1,3 +1,14 @@
+    Fixed some header handling which was kind of, er, broken.
+    Specifically, I'd get an exception on a header which looked
+    like:
+
+    Subject:
+        Hi there
+
+    The only kind of email that I've ever seen this kind of header
+    on has been spam, but nonetheless, it's hardly fair for a mail
+    filter to blow up just because it's given crappy input.
+
 
     Made the comments more rdoc-friendly.
 
