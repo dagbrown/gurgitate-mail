@@ -4,11 +4,12 @@ require "rbconfig"
 require "ftools"
 
 module Gurgitate
+    Package = "gurgitate-mail"
+
     class Install
         def Install.install()
             include Config
 
-            Package = "gurgitate-mail"
             version = CONFIG["MAJOR"] + "." + CONFIG["MINOR"]
             sitedir = CONFIG["sitedir"]
             bindir  = CONFIG["bindir"]
@@ -16,10 +17,10 @@ module Gurgitate
             dest    = "#{sitedir}/#{version}"
 
             print "Installing #{Package}.rb in #{dest}...\n"
-            File.install("${Package}.rb", dest, 0644)
+            File.install("#{Package}.rb", dest, 0644)
 
-            print "Installing ${Package}.1 in #{mandir}...\n"
-            File.install("${Package}.man","#{mandir}/#{Package}.1", 0644)
+            print "Installing #{Package}.1 in #{mandir}...\n"
+            File.install("#{Package}.man","#{mandir}/#{Package}.1", 0644)
 
             print "Installing #{Package} in #{bindir}...\n"
             # Not so simple; need to put in the shebang line
