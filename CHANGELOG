@@ -1,3 +1,11 @@
+1.1.3
+
+    Put the whole thing into a big module, and added some extra
+    comments to make it more rdoc-friendly.  You shouldn't need to
+    change your .gurgitate-rules.rb if you use it like that, but
+    if you use it as a module, you'll need to prefix 'Gurgitate::'
+    to your Gurgitate object construction.
+
 1.1.2 - maintenance release
 
     Changed gurgitate-mail so that it compiles cleanly under Ruby 1.8,
