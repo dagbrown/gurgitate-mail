@@ -401,8 +401,45 @@ EOF
             "headers contains fromline")
         assert_equal(true,h["From","To"] =~ /toline@example.com/,
             "headers contains toline")
+        assert_equal(false,h["From","To"] =~ /nonexistent@example.com/,
+            "headers do not contain nonexistent value")
         assert_equal(false,h["Rabbit"] =~ /nonexistent/,
             "Asking for a nonexistent header")
+    end
+
+    def test_broken_spam
+        m=<<'EOF'
+Return-Path: kirstenparsonsry@yahoo.com
+Delivery-Date: Fri May 21 19:42:02 PDT 
+Return-Path: kirstenparsonsry@yahoo.com
+Delivery-Date: Fri May 21 17:39:51 2004
+Return-Path: <kirstenparsonsry@yahoo.com>
+X-Original-To: dagbrown@lart.ca
+Delivered-To: dagbrown@lart.ca
+Received: from anest.co.jp (c-24-1-221-189.client.comcast.net [24.1.221.189])
+        by lart.ca (Postfix) with ESMTP id 05B7F5704
+        for <dagbrown@lart.ca>; Fri, 21 May 2004 17:39:51 -0700 (PDT)
+Message-ID: <NKELFLPJDPLDHJCMGFHDFEKLLNAA.kirstenparsonsry@yahoo.com>
+From: "Kirsten Parsons" <kirstenparsonsry@yahoo.com>
+To: dagbrown@lart.ca
+Subject: Congrats!
+Date: Fri, 21 May 2004 20:56:27 +0000
+MIME-Version: 1.0
+Content-Type: text/plain
+Content-Transfer-Encoding: base64
+EOF
+        h=Gurgitate::Headers.new(m)
+
+        assert_equal(Gurgitate::Header.new("To","dagbrown@lart.ca").contents,
+                     h["To"][0].contents,"To header is as expected")
+
+        assert_equal(false,h["To","Cc"] =~ /\blunar@lunar-linux.org\b/i,
+            "There should be no Lunar Linux mailing list here")
+
+        assert_equal(false,h["To"] =~ /\blunar@lunar-linux.org\b/i,
+            "There should be no Lunar Linux mailing list in To line")
+        assert_equal(false,h["Cc"] =~ /\blunar@lunar-linux.org\b/i,
+            "There should be no Lunar Linux mailing list in Cc line")
     end
 end
 
