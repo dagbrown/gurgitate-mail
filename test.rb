@@ -88,7 +88,7 @@ EOF
         assert_equal("fromheader@example.com",h["From"][0].contents)
     end
 
-    def test_missing_fromline
+    def test_missing_toline
         h=Gurgitate::Headers.new(<<'EOF'
 From: fromheader@example.com
 EOF
@@ -137,6 +137,27 @@ EOF
         assert_equal("Subject",h["Subject"][0].name)
         assert_equal("Subject line",h["Subject"][0].contents)
     end
+
+    def test_multiline_headers
+        h=Gurgitate::Header.new(<<'EOF'
+From fromline@example.com Sat Oct 25 12:58:31 PDT 2003
+From: fromheader@example.com
+To: toheader@example.com,
+    nexttoheader@example.com
+Subject: Subject line
+EOF
+        )
+        assert_equal(h.from,"fromline@example.com,\n    nexttoheader@example.com")
+        assert_equal(1,h["From"].length)
+        assert_equal("From",h["From"][0].name)
+        assert_equal("fromheader@example.com",h["From"][0].contents)
+        assert_equal(1,h["To"].length)
+        assert_equal("To",h["To"][0].name)
+        assert_equal("toheader@example.com",h["To"][0].contents)
+        assert_equal(1,h["Subject"].length)
+        assert_equal("Subject",h["Subject"][0].name)
+        assert_equal("Subject line",h["Subject"][0].contents)
+    end
 end
 
 def runtests
@@ -145,5 +166,8 @@ def runtests
 end
 
 if __FILE__ == $0 then
+    if(ARGV[0] == '-c')
+        require 'coverage'
+    end
     runtests
 end
