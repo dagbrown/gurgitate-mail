@@ -1,3 +1,7 @@
+ - Made it possible to change the contents of headers.
+
+ - Made the man page not claim to be user-contributed Perl documentation :-)
+
  - Made it deal correctly with headers that have tabs between the colon
    and the data, instead of spaces (bug #154).
 

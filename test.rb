@@ -54,6 +54,21 @@ class TC_Header < Test::Unit::TestCase
         assert_equal(h.contents,h.value,"Contents same as value")
     end
 
+    def test_changing_header
+        h=Gurgitate::Header.new("From: fromheader@example.com")
+        h.contents="anotherfromheader@example.com"
+        assert_equal(h.contents,"anotherfromheader@example.com",
+            "header contents contains new data")
+    end
+
+    def test_tabseparated_header
+        h=Gurgitate::Header.new("From:\tfromheader@example.com")
+        assert_equal(h.name,"From","Tabseparated header is From (bug#154)")
+        assert_equal(h.contents,"fromheader@example.com",
+            "Tabseparated header's contents are correct (bug#154)")
+        assert_equal(h.contents,h.value,"Contents same as value (bug#154)")
+    end
+
     def test_conversion_to_String
         h=Gurgitate::Header.new("From: fromheader@example.com")
         assert_equal(h.to_s,"From: fromheader@example.com", "Conversion to string returns input")
@@ -304,6 +319,74 @@ EOF
         assert_equal(1,h["Subject"].length)
         assert_equal("Subject",h["Subject"][0].name)
         assert_equal("Re: [nifty] Ping...",h["Subject"][0].contents)
+    end
+
+    def another_crashy_test
+        h=Gurgitate::Headers.new(<<'EOF'
+From HEYITBLEWUP Fri Nov 21 14:41:08 PST 2003
+Received: from unknown (harley.radius [192.168.0.123]) by yoda.radius with SMTP (Microsoft Exchange Internet Mail Service Version 5.5.2653.13)
+	id LYN7YZKG; Wed, 9 Jul 2003 14:36:40 -0700
+Subject: IAP password
+EOF
+        )
+        assert_equal(h.from,"HEYITBLEWUP")
+        assert_equal(1,h["From"].length)
+        assert_equal("From",h["From"][0].name)
+        assert_equal("IAP password",h["Subject"][0].name)
+    end
+
+    def test_fromline_no_hostname # illegal from line
+        m=<<'EOF'
+From HEYITBLEWUP Sat Mar 27 16:02:12 PST 2004
+Received: from ohno.mrbill.net (ohno.mrbill.net [207.200.6.75])
+        by lart.ca (Postfix) with ESMTP id A485F104CA9
+        for <dagbrown@lart.ca>; Sat, 27 Mar 2004 15:58:06 -0800 (PST)
+Received: by ohno.mrbill.net (Postfix)
+        id 0D3423A289; Sat, 27 Mar 2004 17:58:42 -0600 (CST)
+Delivered-To: dagbrown@mrbill.net
+Received: from 66-168-59-126.jvl.wi.charter.com (66-168-59-126.jvl.wi.charter.com [66.168.59.126])
+        by ohno.mrbill.net (Postfix) with SMTP id 948BD3A288
+        for <dagbrown@dagbrown.com>; Sat, 27 Mar 2004 17:58:41 -0600 (CST)
+X-Message-Info: HOCBSQX
+Message-Id: <20040327235841.948BD3A288@ohno.mrbill.net>
+Date: Sat, 27 Mar 2004 17:58:41 -0600 (CST)
+From: ""@
+To: undisclosed-recipients: ;
+EOF
+        h=Gurgitate::Headers.new(m)
+        assert_equal(%{""@},h["From"][0].contents)
+        assert_equal(1,h["From"].length)
+    end
+
+    def test_editing_header
+        m = <<'EOF'
+From fromline@example.com Sat Oct 25 12:58:31 PDT 2003
+From: fromline@example.com
+To: toline@example.com
+Subject: Subject line
+EOF
+        h=Gurgitate::Headers.new(m)
+        h["From"]="anotherfromline@example.com"
+        assert_equal("anotherfromline@example.com",h["From"][0].contents,
+            "From line correctly changed")
+        assert_match(/^From: anotherfromline@example.com$/,h.to_s,
+            "From line correctly turns up in finished product")
+    end
+
+    def test_editing_from
+        m = <<'EOF'
+From fromline@example.com Sat Oct 25 12:58:31 PDT 2003
+From: fromline@example.com
+To: toline@example.com
+Subject: Subject line
+EOF
+        h=Gurgitate::Headers.new(m)
+        t=Time.new.to_s
+        h.from="anotherfromline@example.com"
+        assert_equal("anotherfromline@example.com",h.from,
+            "Envelope from correctly changed")
+        assert_match(/^From anotherfromline@example.com #{t}/,
+            h.to_s, "Envelope from changed in finished product")
     end
 end
 

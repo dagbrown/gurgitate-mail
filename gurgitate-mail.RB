@@ -35,17 +35,22 @@ module Gurgitate
         # Creates a Header object.
         # header::
         #   The text of the email-message header
-        def initialize(header)
-            if(header =~ /^[a-zA-Z][a-zA-Z0-9-]*:/) then
-                (name,contents)=header.split(/:\s+/,2)
+        def initialize(*header)
+            name,contents=nil,nil
+            if header.length == 1 then
+                if(header[0] =~ /^[a-zA-Z][a-zA-Z0-9-]*:/) then
+                    (name,contents)=header[0].split(/:\s+/,2)
 
-                raise IllegalHeader, "Empty name" \
-                    if (name == "" or name == nil)
-                contents="" if contents == nil
+                    raise IllegalHeader, "Empty name" \
+                        if (name == "" or name == nil)
+                    contents="" if contents == nil
 
-                @@lastname=name
-            else
-                raise IllegalHeader, "Bad header syntax: no colon in #{header}"
+                    @@lastname=name
+                else
+                    raise IllegalHeader, "Bad header syntax: no colon in #{header}"
+                end
+            elsif header.length == 2 then
+                name,contents = *header
             end
 
             @name=capitalize_words(name)
@@ -63,6 +68,8 @@ module Gurgitate
         def matches (regex)
             @contents =~ regex
         end
+
+        alias :=~ :matches
 
         # Returns the header, ready to put into an email message
         def to_s
@@ -110,6 +117,8 @@ module Gurgitate
                     @lastheader=header
                 end
             end
+
+            @headers_changed=false
 
             # Okay, now worry about the "From foo@bar" line.  If it's
             # not there, then make one up from the Return-Path:
@@ -160,9 +169,22 @@ module Gurgitate
         # name:: The name of the header.
         def [](name); return @headers[name]; end
 
+        # Set the header named +name+ to +value+
+        # name:: The name of the header.
+        # value:: The new value of the header.
+        def []=(name,value)
+            @headers_changed = true
+            @headers[name]=[Header.new(name,value)]
+        end
+
         # Who the message is from
         def from
             return @from || ""
+        end
+
+        def from=(newfrom) 
+            @from=newfrom
+            @unix_from="From "+self.from+" "+Time.new.to_s;
         end
 
         # Match header +name+ against +regex+
@@ -197,7 +219,13 @@ module Gurgitate
         # Returns the headers properly formatted for an email
         # message.
         def to_s
-            return @unix_from+"\n"+@headertext
+            if @headers_changed then
+                return @unix_from+"\n"+@headers.collect { |n,h|
+                    h.collect { |h| h.to_s }.join("\n")
+                }.join("\n")
+            else
+                return @unix_from+"\n"+@headertext
+            end
         end
     end
 
