@@ -4,5 +4,5 @@
 
 require "gurgitate-mail"
 
-message=Gurgitate.new(STDIN);
+message=Gurgitate::Gurgitate.new(STDIN);
 message.process
