@@ -1,6 +1,9 @@
 1.4.1:
  I said I'd given up on minor changes?  I lied.
 
+ - Had it assume that if a file isn't present, that it's a MBox mailbox,
+   and create it.
+
  - Changed the constructor for Gurgitate to take all login information
    from the effective UID instead of trusting the real UID and the
    EUID to be the same.
