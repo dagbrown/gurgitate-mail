@@ -31,7 +31,9 @@ task :dist => :tarball
 task :tarball => Tarball
 task :release => [:tag, :tarball, :webpage]
 
-task(:clean) { delete_all(*Targets+["pod2htm*~~","gurgitate-mail.txt","doc"]) }
+task(:clean) { 
+    delete_all(*Targets+["pod2htm*~~","*.tmp","gurgitate-mail.txt","doc"]) 
+}
 
 task :install => Targets do
     require "install"
