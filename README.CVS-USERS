@@ -6,9 +6,13 @@ downloading gurgitate-mail, odds are you actually want to use it
 (if you are interested in doing development on it, though, send me
 an email).
 
-The best way to get started, since you're here, is to say "make
+The best way to get started, since you're here, is to say "rake
 tarball", which will get you a tar file of the sort that you'd
 normally download from the release page.  Then you can unpack
 that, and follow the release instructions contained therein.
+
+If you don't have rake installed then grab a copy of it at:
+
+    http://jimweirich.umlcoop.net/packages/rake/
 
 --Dave
