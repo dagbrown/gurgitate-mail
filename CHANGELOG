@@ -1,3 +1,10 @@
+1.4.1:
+ I said I'd given up on minor changes?  I lied.
+
+ - Changed the constructor for Gurgitate to take all login information
+   from the effective UID instead of trusting the real UID and the
+   EUID to be the same.
+
 1.4:
  I seem to have given up on minor changes.  More big stuff.
 
