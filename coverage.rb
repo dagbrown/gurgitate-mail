@@ -1,6 +1,7 @@
 SCRIPT_LINES__ = {} unless defined? SCRIPT_LINES__
 
 module COVERAGE__
+    INCLUDE_FILES=/gurgitate-mail.rb/
     COVER = {}
     def self.trace_func(event, file, line, id, binding, klass)
         case event
@@ -15,8 +16,9 @@ module COVERAGE__
     END {
         set_trace_func(nil)
         COVER.each do |file, lines|
+            next unless file =~ INCLUDE_FILES
             if SCRIPT_LINES__.has_key?(file)
-                printf("\x1b[32m--- %s\x1b[0m\n", file)
+                printf("--- %s\n", file)
                 lines = SCRIPT_LINES__[file]
                 covers = COVER[file]
                 0.upto(lines.size - 1) do |c|
@@ -32,7 +34,7 @@ module COVERAGE__
                         marked = true
                     end
                     if marked
-                        printf("\x1b[31m+ %s\x1b[0m\n", line)
+                        printf("+ %s\n", line)
                     else
                         printf("  %s\n", line)
                     end
