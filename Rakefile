@@ -24,7 +24,7 @@ Targets = %w{gurgitate-mail.rb gurgitate-mail gurgitate-mail.html
 
 Webpage=ENV["HOME"]+"/public_html/software/gurgitate-mail"
 Version=File.open("VERSION").read.chomp
-Tarball="../gurgitate-mail-"+Version+".tar.gz"
+Tarball="gurgitate-mail-"+Version+".tar.gz"
 
 task :default => Targets
 task :dist => :tarball
@@ -42,6 +42,7 @@ end
 
 file Tarball => Targets + ["CHANGELOG","INSTALL","install.rb"] do |t|
     Dir.chdir("..") {
+        puts "Creating #{Dir.pwd}/#{Tarball}..."
         files=t.prerequisites.map { |f| f.gsub(/^/,"gurgitate-mail/") }
         system("tar","zcvf",Tarball,*files)
     }
