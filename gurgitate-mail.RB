@@ -293,7 +293,6 @@ module Gurgitate
     # other stuff with it, like save to a mailbox or forward
     # it somewhere else.
     class Gurgitate < Mailmessage
-        include Etc
         # The directory you want to put mail folders into
         attr_writer :maildir
         # The path to your log file
@@ -319,7 +318,7 @@ module Gurgitate
         # spooldir::
         #   The location of the mail spools directory.
         def initialize(input=nil,spooldir="/var/spool/mail",&block)
-            @passwd=getpwnam(getlogin)
+            @passwd=Etc.getpwuid
             @homedir=@passwd.dir;
             @maildir=@passwd.dir+"/Mail"
             @logfile=@passwd.dir+"/.gurgitate.log"
