@@ -14,10 +14,37 @@ module Gurgitate
             sitedir = CONFIG["sitedir"]
             bindir  = CONFIG["bindir"]
             mandir  = CONFIG["mandir"] + "/man1"
-            dest    = "#{sitedir}/#{version}"
+            dest    = File.join(sitedir,version)
+            destgur = File.join(dest,"gurgitate")
+            destdel = File.join(destgur,"deliver")
 
             print "Installing #{Package}.rb in #{dest}...\n"
             File.install("#{Package}.rb", dest, 0644)
+            
+            print "Creating #{destgur}..."
+            begin
+                Dir.mkdir(destgur)
+                print "\n"
+            rescue Errno::EEXIST
+                puts "no need, it's already there."
+            end
+            Dir.glob(File.join("gurgitate","*.rb")).each { |f|
+                puts "Installing #{f} in #{destgur}..."
+                File.install(f,destgur)
+            }
+
+            print "Creating #{destdel}..."
+            begin
+                Dir.mkdir(destdel)
+                print "\n"
+            rescue Errno::EEXIST
+                puts "no need, it's already there."
+            end
+            Dir.glob(File.join(File.join("gurgitate","deliver"),"*.rb")).each {
+            |f|
+                puts "Installing #{f} in #{destdel}..."
+                File.install(f,destdel)
+            }
 
             print "Installing #{Package}.1 in #{mandir}...\n"
             File.install("#{Package}.man","#{mandir}/#{Package}.1", 0644)
