@@ -1,0 +1,14 @@
+Hi.
+
+If you're reading this file, that means you pulled this out of
+CVS, which might not be necessarily what you wanted.  If you're
+downloading gurgitate-mail, odds are you actually want to use it
+(if you are interested in doing development on it, though, send me
+an email).
+
+The best way to get started, since you're here, is to say "make
+tarball", which will get you a tar file of the sort that you'd
+normally download from the release page.  Then you can unpack
+that, and follow the release instructions contained therein.
+
+--Dave
