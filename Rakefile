@@ -64,6 +64,11 @@ task :doc => "gurgitate-mail.rb" do |task|
     end
 end
 
+task :test => :default do
+    require './test'
+    runtests
+end
+
 task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 
     install(Tarball,Webpage,0644)
     install("CHANGELOG",Webpage+"/CHANGELOG.txt",0644)
