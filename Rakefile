@@ -96,5 +96,5 @@ file "README" => "gurgitate-mail.text" do |t|
 end
 
 ['html','man','text'].each do |s|
-    rule('.'+s => '.pod') { |t| Sys.run "pod2#{s} #{t.source} > #{t.name}" }
+    rule('.'+s => '.pod') { |t| Sys.run "pod2#{s} --center=\"Gurgitate-Mail\" #{t.source} > #{t.name}" }
 end
