@@ -1,9 +1,32 @@
+
+    Made the comments more rdoc-friendly.
+
+    Fixed the handling of multi-line headers--it was getting it
+    RONG RONG RONG (but I've probably implemented this RONG RONG
+    RONG too).
+
+
+    Made it so that as well as saying 
+                                
+    g=Gurgitate::Gurgitate.new(filehandle)
+    if g.head =~ /evil@bad.com/ then delete end
+                                
+    you can also say             
+                                
+        Gurgitate::Gurgitate.new(filehandle) do
+            if head =~ /evil@bad.com/ then delete end
+        end                         
+                                
+    Which gives you another place to put your .gurgitate-rules.
+
+
     Made install.rb work as both a script as a library, because
     I switched to using rake to build things, rather than make.
 
+
     Made it canonicalize headers to a standard capitalization,
-    because some SMTP client (ahem) is incorrectly sending out
-    all-uppercase headers.
+    because some SMTP client (*cough*virus*cough*) is incorrectly
+    sending out all-uppercase headers.
 
 1.1.3
 
