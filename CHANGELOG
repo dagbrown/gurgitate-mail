@@ -1,3 +1,8 @@
+1.1.2 - maintenance release
+
+    Changed gurgitate-mail so that it compiles cleanly under Ruby 1.8,
+    and made it work with no warnings.
+
 1.1.1 - maintenance release
 
     Fixed the regexes for my own email addresses--they had backslashes
