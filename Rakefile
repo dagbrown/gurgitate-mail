@@ -1,4 +1,4 @@
-#------------------------------------------------------------------------
+#========================================================================
 # Rakefile for gurgitate-mail
 #
 # You should probably not be trying to use this if you're not me. :-) If
@@ -15,9 +15,9 @@
 # If you don't have rake installed then grab a copy of it at:
 #
 #       http://jimweirich.umlcoop.net/packages/rake/
-#------------------------------------------------------------------------
+#========================================================================
 
-include RakeTools
+require 'ftools'
 
 Modules =  %w{gurgitate/deliver.rb
              gurgitate/headers.rb 
@@ -41,7 +41,8 @@ task :tarball => Tarball
 task :release => [:tag, :tarball, :webpage]
 
 task(:clean) { 
-    delete_all(*Targets+["pod2htm*~~","*.tmp","gurgitate-mail.txt","doc"]) 
+    delete_all(*Targets+["pod2htm*~~","*.tmp",
+        "gurgitate-mail.txt","doc","*~"]) 
 }
 
 task :install => Targets do
@@ -58,15 +59,15 @@ file Tarball => Targets + ["CHANGELOG","INSTALL","install.rb"] do |t|
 end
 
 task :tag => "VERSION" do
-    Sys.run("cvs update VERSION")
+    run("cvs update VERSION")
     tag="RELEASE_"+File.open("VERSION").read.chomp.gsub(/\./,"_")
-    Sys.run("cvs tag #{tag}")
+    run("cvs tag #{tag}")
 end
 
 task :untag => "VERSION" do
-    Sys.run("cvs update VERSION")
+    run("cvs update VERSION")
     tag="RELEASE_"+File.open("VERSION").read.chomp.gsub(/\./,"_")
-    Sys.run("cvs tag -d #{tag}")
+    run("cvs tag -d #{tag}")
 end
 
 task :doc => "gurgitate-mail.rb" do |task|
@@ -90,9 +91,9 @@ end
 # Should be ruby_"compile" but I can't put quote marks in method names :-)
 def ruby_compile(task)
     task.prerequisites.each do |p|
-        Sys.run("ruby -w -c #{p}")
+        run("ruby -w -c #{p}")
     end
-    Sys.copy(task.prerequisites[0],task.name)
+    File.copy(task.prerequisites[0], task.name, true)
 end    
 
 file("gurgitate-mail.rb" => ["gurgitate-mail.RB"]) { |t| ruby_compile(t) }
@@ -104,15 +105,46 @@ end
 file "README" => "gurgitate-mail.text" do |t|
     t.source=t.prerequisites[0]
     Task[t.source].invoke
-    Sys.copy(t.source,t.name)
+    File.copy(t.source, t.name, true)
 end
 
 %w{html text}.each do |s|
     rule('.'+s => '.pod') do |t|
-        Sys.run "pod2#{s} #{t.source} > #{t.name}"
+        run "pod2#{s} #{t.source} > #{t.name}"
     end
 end
 
 ['man'].each do |s|
-    rule('.'+s => '.pod') { |t| Sys.run "pod2#{s} --center=\"Gurgitate-Mail\" #{t.source} > #{t.name}" }
+    rule('.'+s => '.pod') { |t| run "pod2#{s} --center=\"Gurgitate-Mail\" #{t.source} > #{t.name}" }
 end
+
+#------------------------------------------------------------------------
+# Apparently rake/contrib/sys.rb is deprecated in favor of ftools, but
+# ftools doesn't have these to really handy methods, so I'm stealing 'em.
+#------------------------------------------------------------------------
+
+def run(cmd)
+    puts cmd
+    system(cmd) or fail "Command Failed: [#{cmd}]"
+end
+
+def delete_all(*wildcards)
+    wildcards.each do |wildcard|
+        Dir[wildcard].each do |fn|
+            next if ! File.exist?(fn)
+            if File.directory?(fn)
+                Dir["#{fn}/*"].each do |subfn|
+                    next if subfn=='.' || subfn=='..'
+                    delete_all(subfn)
+                end
+                puts "Deleting directory #{fn}"
+                Dir.delete(fn)
+            else
+                puts "Deleting file #{fn}"
+                File.delete(fn)
+            end
+        end
+    end
+end
+
+# Psst, Emacs, this file is actually -*- ruby -*-
