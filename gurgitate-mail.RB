@@ -1,3 +1,4 @@
+#!/opt/bin/ruby
 #------------------------------------------------------------------------
 # Mail filter package
 #------------------------------------------------------------------------
@@ -6,29 +7,58 @@ require 'etc'
 
 module Gurgitate
 
-    #========================================================================
+#========================================================================
+
+
+    class IllegalHeader < RuntimeError ; end
+
     # A little class for a single header
-    #========================================================================
+
     class Header
         # The name of the header
         attr_accessor :name
         # The contents of the header
         attr_accessor :contents
 
-        # Creates a Header object with the header's text in
-        # <header>
+        alias_method :value, :contents
+
+        # A recent rash of viruses has forced me to canonicalize
+        # the capitalization of headers.  Sigh.
         def capitalize_words(s)
             return s.split(/-/).map { |w| w.capitalize }.join("-")
         end
 
+        private :capitalize_words
+
+        # Creates a Header object.
+        # header::
+        #   The text of the email-message header
         def initialize(header)
-            (name,contents)=header.split(/: /,2)
+            if(header =~ /: /) then
+                (name,contents)=header.split(/: /,2)
+
+                raise IllegalHeader, "Empty name" \
+                    if (name == "" or name == nil)
+                raise IllegalHeader, "Bad header syntax: #{name}" \
+                    if contents == nil
+                raise IllegalHeader, "Empty header contents" \
+                    if contents == ""
+
+                @@lastname=name
+            end
 
             @name=capitalize_words(name)
             @contents=contents
         end
 
-        # Matches a header to a regex
+        # Extended header
+        def << (text)
+            @contents += "\n" + text
+        end
+
+        # Matches a header's contents.
+        # regex::
+        #   The regular expression to match against the header's contents
         def matches (regex)
             @contents =~ regex
         end
@@ -39,13 +69,14 @@ module Gurgitate
         end
     end
 
-    #========================================================================
+#========================================================================
+
     # A slightly bigger class for all of a message's headers
-    #========================================================================
     class Headers
 
-        # Creates a Headers object with the text of the headers in
-        # <headertext>
+        # Creates a Headers object.
+        # headertext::
+        #   The text of the message headers.
         def initialize(headertext)
             @headers=Hash.new(nil)
             @headertext=headertext
@@ -68,9 +99,14 @@ module Gurgitate
             end
 
             @headertext.split(/\n/).each do |h|
-                header=Header.new(h)
-                @headers[header.name]=[] if @headers[header.name]==nil;
-                @headers[header.name].push(header)
+                if(h=~/^\s+/) then
+                    @lastheader << h
+                else
+                    header=Header.new(h)
+                    @headers[header.name]=[] if @headers[header.name]==nil;
+                    @headers[header.name].push(header)
+                    @lastheader=header
+                end
             end
 
             # Okay, now worry about the "From foo@bar" line.  If it's
@@ -118,7 +154,8 @@ module Gurgitate
             end
         end
 
-        # Grab the header with name "name"
+        # Grab the header with name +name+
+        # name:: The name of the header.
         def [](name); return @headers[name]; end
 
         # Who the message is from
@@ -126,7 +163,11 @@ module Gurgitate
             return @from
         end
 
-        # Return true if header <name> matches <regex>
+        # Match header +name+ against +regex+
+        # name:: 
+        #   A string containing the name of the header to match (for example,
+        #   "From")
+        # regex:: The regex to match it against (for example, /@aol.com/)
         def match(name,regex)
             ret=false
             if(@headers[name]) then
@@ -137,7 +178,9 @@ module Gurgitate
             return ret
         end
 
-        # Return true if headers <names> match <regex>
+        # Return true if headers +names+ match +regex+
+        # names:: An array of header names (for example, %w{From Reply-To})
+        # regex:: The regex to match the headers against.
         def matches(names,regex)
             ret=false
             if names.class == "String" then
@@ -157,8 +200,9 @@ module Gurgitate
     end
 
     #========================================================================
-    # A class to deal with a message in its entirety
-    #========================================================================
+
+    # A complete mail message.
+
     class Mailmessage
         # The headers of the message
         attr_reader :headers
@@ -173,11 +217,9 @@ module Gurgitate
             @from=$+
         end
 
-        # Returns the header <name>
+        # Returns the header +name+
         def header(name)
-            @headers[name].each do |h|
-                h.contents
-            end.join(", ");
+            @headers[name].each { |h| h.contents }.join(", ")
         end
 
         # custom accessors
@@ -190,9 +232,10 @@ module Gurgitate
     end
 
     #========================================================================
-    # The actual gurgitator; reads a message and then can do other stuff
-    # with it, like save to a mailbox or forward somewhere else.
-    #========================================================================
+
+    # The actual gurgitator; reads a message and then it can do
+    # other stuff with it, like save to a mailbox or forward
+    # it somewhere else.
     class Gurgitate < Mailmessage
         include Etc
         # The directory you want to put mail folders into
@@ -213,8 +256,13 @@ module Gurgitate
         # Spoolfile=Spooldir+"/"+Etc.getlogin()
 
         # Set config params to defaults, read in mail message from
-        # <fh>
-        def initialize(input=nil,spooldir="/var/spool/mail")
+        # +input+
+        # input::
+        #   Either the text of the email message in RFC-822 format,
+        #   or a filehandle where the email message can be read from
+        # spooldir::
+        #   The location of the mail spools directory.
+        def initialize(input=nil,spooldir="/var/spool/mail",&block)
             @passwd=getpwnam(getlogin)
             @homedir=@passwd.dir;
             @maildir=@passwd.dir+"/Mail"
@@ -228,12 +276,16 @@ module Gurgitate
             else
                 super(input)
             end
+            
+            instance_eval(&block) if block_given?
         end
 
-        # Saves a message to a mailbox.
-        # If the mailbox is of the form "=mailbox", it puts it into
-        # Maildir/mailbox.
-        # Otherwise, it puts it into the file you ask for.
+        # Saves a message to +mailbox+.
+        # mailbox::
+        #   A string containing the path of the mailbox to save
+        #   the message to.  If it is of the form "=mailbox", it
+        #   saves the message to +Maildir+/+mailbox+.  Otherwise,
+        #   it simply saves the message to the file +mailbox+.
         def save(mailbox)
             if mailbox[0,1]=='=' and @maildir != nil
                 mailbox["="]=@maildir+"/"
@@ -248,8 +300,8 @@ module Gurgitate
             begin
                 File.open(mailbox,"a") do |f|
                     f.flock(File::LOCK_EX)
-                    # Do this all at once so that it doesn't write half a message
-                    # if it's going to barf
+                    # Do this all at once so that it doesn't write half a
+                    # message if it's going to barf
                     # f.print "From "+self.from+" "+Time.new.to_s+"\n"
                     f.print self.to_s+"\n"
                     f.flock(File::LOCK_UN)
@@ -260,11 +312,14 @@ module Gurgitate
             end
         end
         
-        # deletes the current message
+        # Deletes the current message.
         def delete
+            # Well, nothing here, really.
         end
 
-        # Forwards the message to <address>
+        # Forwards the message to +address+.
+        # address::
+        #   A valid email address to forward the message to.
         def forward(address)
             self.log "Forwarding to "+address
             IO.popen(@sendmail+" "+address,"w") do |f|
@@ -272,7 +327,7 @@ module Gurgitate
             end
         end
 
-        # Writes <message> to the log file.
+        # Writes +message+ to the log file.
         def log(message)
             if(@logfile)then
                 File.open(@logfile,"a") do |f|
@@ -283,8 +338,8 @@ module Gurgitate
             end
         end
 
-        # Pipes the message through <program>.  If <program>
-        # fails, puts the message into <spoolfile>
+        # Pipes the message through +program+.  If +program+
+        # fails, puts the message into +spoolfile+
         def pipe(program)
             self.log "Piping through "+program
             IO.popen(program,"w") do |f|
@@ -296,8 +351,8 @@ module Gurgitate
             return -1
         end
 
-        # Pipes the message through a program, and returns another
-        # Gurgitate object containing the output of the filter
+        # Pipes the message through +program+, and returns another
+        # +Gurgitate+ object containing the output of the filter
         def filter(program)
             self.log "Filtering with "+program
             IO.popen("-","w+") do |filter|
@@ -306,7 +361,7 @@ module Gurgitate
                 else
                     if fork
                         filter.close_write
-                        return Gurgitate.new(filter)
+                        return Gurgitate::Gurgitate.new(filter)
                     else
                         filter.close_read
                         filter.print(self.to_s)
@@ -321,17 +376,13 @@ module Gurgitate
         end
 
         # Processes your .gurgitate-rules.rb.
-        def process
-            configfilespec=homedir+"/.gurgitate-rules.rb"
+        def process(configfilespec=homedir+"/.gurgitate-rules.rb")
             if FileTest.exist?(configfilespec) and 
                 FileTest.file?(configfilespec) and 
                 FileTest.owned?(configfilespec) and 
                 FileTest.readable?(configfilespec)
             then
-                configfile=File.new(configfilespec)
-                rules=configfile.read
-                eval rules 
-                save(spoolfile)
+                eval File.new(configfilespec).read
             else
                 save(spoolfile)
             end
