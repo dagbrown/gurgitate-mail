@@ -22,7 +22,7 @@ module Gurgitate
                         return nil
                     end
                 rescue Errno::ENOENT
-                    return MBox
+                    return nil
                 end
             end
 

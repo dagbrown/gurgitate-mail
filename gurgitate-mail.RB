@@ -28,6 +28,8 @@ module Gurgitate
         attr_reader :spoolfile
         # The directory where user mail spools live
         attr_reader :spooldir
+        # What kind of mailboxes you prefer
+        attr_writer :folderstyle
         
         # Constants
         # Spooldir="/var/spool/mail"
@@ -41,13 +43,14 @@ module Gurgitate
         # spooldir::
         #   The location of the mail spools directory.
         def initialize(input=nil,spooldir="/var/spool/mail",&block)
-            @passwd    = Etc.getpwuid
-            @homedir   = @passwd.dir;
-            @maildir   = File.join(@passwd.dir,"Mail")
-            @logfile   = File.join(@passwd.dir,".gurgitate.log")
-            @sendmail  = "/usr/lib/sendmail"
-            @spooldir  = spooldir
-            @spoolfile = File.join(@spooldir,@passwd.name )
+            @passwd      = Etc.getpwuid
+            @homedir     = @passwd.dir;
+            @maildir     = File.join(@passwd.dir,"Mail")
+            @logfile     = File.join(@passwd.dir,".gurgitate.log")
+            @sendmail    = "/usr/lib/sendmail"
+            @spooldir    = spooldir
+            @spoolfile   = File.join(@spooldir,@passwd.name )
+            @folderstyle = MBox
 
             input_text = ""
             input.each do |l| input_text << l end
@@ -59,6 +62,22 @@ module Gurgitate
         def delete
             # Well, nothing here, really.
             true
+        end
+
+        # This is a neat one.  You can get any header as a method.
+        # Say, if you want the header "X-Face", then you call
+        # x_face and that gets it for you.  It raises NameError if
+        # that header isn't found.
+        # meth::
+        #   The method that the caller tried to call which isn't
+        #   handled any other way.
+        def method_missing(meth)
+            headername=meth.to_s.split(/_/).map {|x| x.capitalize}.join("-")
+            if defined?(headers[headername]) then
+                return headers[headername]
+            else
+                raise NameError,"undefined local variable or method, or header not found `#{meth}' for #{self}:#{self.class}"
+            end
         end
 
         # Forwards the message to +address+.
@@ -105,7 +124,9 @@ module Gurgitate
                 else
                     if fork
                         filter.close_write
-                        return Gurgitate::Gurgitate.new(filter)
+                        g=Gurgitate::Gurgitate.new(filter)
+                        g.instance_eval(&block) if block_given?
+                        return g
                     else
                         filter.close_read
                         filter.print(self.to_s)

@@ -11,6 +11,10 @@ require "gurgitate/deliver/maildir"
 module Gurgitate
     module Deliver
 
+        class MailboxFound < Exception
+            # more of a "flag" than an exception really
+        end
+
         # Saves a message to +mailbox+, after detecting what the mailbox's
         # format is.
         # mailbox::
@@ -29,10 +33,28 @@ module Gurgitate
                 mailbox=spoolfile
             end
 
-            [MBox,Maildir].each do |mod|
-                if mod::check_mailbox(mailbox) then
-                    self.class.instance_eval do include mod end
+            begin
+                [MBox,Maildir].each do |mod|
+                    if mod::check_mailbox(mailbox) then
+                        self.class.instance_eval do 
+                            include mod
+                            raise MailboxFound
+                        end
+                    end
                 end
+
+                # Huh, nothing could find anything.  Oh well,
+                # let's default to whatever's in @folderstyle.  (I
+                # guess we'll be making a new mailbox, eh?)
+
+                self.class.instance_eval do
+                    include @folderstyle
+                end
+                
+            rescue MailboxFound
+                # Don't need to do anything--we only have to worry
+                # about it if there wasn't a mailbox there.
+                nil
             end
 
             begin

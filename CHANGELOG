@@ -1,3 +1,23 @@
+1.5:
+- Added a thing to the "filter" method so that you can say something like
+
+        filter("spamc") do
+            if headers["X-Spam"] =~ "Yes" then
+                delete
+            end
+        end
+
+  if you want to.
+
+- Also added the ability to put
+
+      folderstyle = Maildir
+
+  into your .gurgitate-rules.rb to tell it that if it doesn't find
+  a mailbox, it should create a Maildir mailbox rather than its
+  usual default (mbox).
+
+
 1.4.1:
  I said I'd given up on minor changes?  I lied.
 

@@ -39,12 +39,22 @@ module Gurgitate
                 hostname=Socket::gethostname
                 filename=nil
                 loop do
-                    filename=File.join(dir,sprintf("%.4f.%d_%d.%s",time,$$,counter,
-                                                   hostname))
+                    filename=File.join(dir,sprintf("%.4f.%d_%d.%s",
+                                                   time,$$,counter,hostname))
                     break if not File.exists?(filename)
                     maildir_counter+=1
                 end
                 return filename
+            end
+
+            # Creates a new Maildir folder +mailbox+
+            # mailbox::
+            #   The full path of the new folder to be created
+            def make_mailbox(mailbox)
+                Dir.mkdir(mailbox)
+                %w{cur,tmp,new}.each do |dir|
+                    Dir.mkdir(File.join(mailbox,dir))
+                end
             end
 
             # Delivers a message to the maildir-format mailbox +mailbox+.
@@ -54,6 +64,12 @@ module Gurgitate
             #   the message to +Maildir+/+mailbox+.  Otherwise, it
             #   simply saves the message to the file +mailbox+.
             def deliver_message(mailbox)
+                begin
+                    File.stat(mailbox)
+                rescue Errno::ENOENT
+                    make_mailbox(mailbox)
+                end
+
                 tmpfilename=maildir_getfilename(File.join(mailbox,"tmp"))
                 File.open(tmpfilename,File::CREAT|File::WRONLY) do |fh|
                     fh.write(self.to_s)
@@ -66,7 +82,9 @@ module Gurgitate
                     # for me.
                 end
 
-                # link to cur
+                # ...and link to new.
+                # (I guess Maildir mailboxes don't work too well
+                # on Windows, eh?)
                 newfilename = maildir_getfilename(
                                         File.join(mailbox,"new"))
                 begin
