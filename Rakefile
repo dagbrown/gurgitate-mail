@@ -95,6 +95,10 @@ file "README" => "gurgitate-mail.text" do |t|
     Sys.copy(t.source,t.name)
 end
 
-['html','man','text'].each do |s|
+rule('.html' => '.pod') do |t|
+    Sys.run "pod2html #{t.source} > #{t.name}"
+end
+
+['man','text'].each do |s|
     rule('.'+s => '.pod') { |t| Sys.run "pod2#{s} --center=\"Gurgitate-Mail\" #{t.source} > #{t.name}" }
 end
