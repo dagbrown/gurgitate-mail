@@ -26,6 +26,8 @@ module Gurgitate
         # the capitalization of headers.  Sigh.
         def capitalize_words(s)
             return s.split(/-/).map { |w| w.capitalize }.join("-")
+          rescue
+            return s
         end
 
         private :capitalize_words
@@ -41,10 +43,10 @@ module Gurgitate
                     if (name == "" or name == nil)
                 raise IllegalHeader, "Bad header syntax: #{name}" \
                     if contents == nil
-                raise IllegalHeader, "Empty header contents" \
-                    if contents == ""
 
                 @@lastname=name
+            else
+                raise IllegalHeader, "Bad header syntax: no colon"
             end
 
             @name=capitalize_words(name)
@@ -160,7 +162,7 @@ module Gurgitate
 
         # Who the message is from
         def from
-            return @from
+            return @from || ""
         end
 
         # Match header +name+ against +regex+
