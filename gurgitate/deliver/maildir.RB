@@ -15,10 +15,10 @@ module Gurgitate
             #   message to.  If it is of the form "=mailbox", it saves
             #   the message to +Maildir+/+mailbox+.  Otherwise, it
             #   simply saves the message to the file +mailbox+.
-            def check_mailbox(mailbox)
+            def self::check_mailbox(mailbox)
                 if File.stat(mailbox).directory? then
                     if File.stat(File.join(mailbox,"cur")).directory? then
-                        return Gurgitate::Deliver::Maildir
+                        return Maildir
                     end
                 end
             end
@@ -33,10 +33,11 @@ module Gurgitate
                 time=Time.now.to_f
                 counter=0
                 hostname=Socket::gethostname
+                filename=nil
                 loop do
                     filename=File.join(dir,sprintf("%.4f.%d_%d.%s",time,$$,counter,
                                                    hostname))
-                    break if not File.exists?(maildir_filename)
+                    break if not File.exists?(filename)
                     maildir_counter+=1
                 end
                 return filename
@@ -48,9 +49,9 @@ module Gurgitate
             #   message to.  If it is of the form "=mailbox", it saves
             #   the message to +Maildir+/+mailbox+.  Otherwise, it
             #   simply saves the message to the file +mailbox+.
-            def save(mailbox)
+            def deliver_message(mailbox)
                 tmpfilename=maildir_getfilename(File.join(mailbox,"tmp"))
-                File.open(maildir_filename,File::CREAT|File::WRONLY) do |fh|
+                File.open(tmpfilename,File::CREAT|File::WRONLY) do |fh|
                     fh.write(self.to_s)
                     fh.flush
                     # I should put a caveat here, unfortunately.  Ruby's
@@ -62,10 +63,10 @@ module Gurgitate
                 end
 
                 # link to cur
-                maildir_newfilename = maildir_getfilename(
+                newfilename = maildir_getfilename(
                                         File.join(mailbox,"new"))
                 begin
-                    File.link(maildir_filename,maildir_newfilename)
+                    File.link(tmpfilename,newfilename)
                 rescue SystemCallError
                     log("Couldn't create maildir link to \"new\"!")
                     exit 75 # Argh, I tried, it didn't work out

@@ -13,9 +13,9 @@ module Gurgitate
             #   the message to.  If it is of the form "=mailbox", it
             #   saves the message to +Maildir+/+mailbox+.  Otherwise,
             #   it simply saves the message to the file +mailbox+.
-            def check_mailbox(mailbox)
+            def self::check_mailbox(mailbox)
                 if File.stat(mailbox).file? then 
-                    return true
+                    return MBox
                 else
                     return nil
                 end

@@ -14,6 +14,8 @@ module Gurgitate
     # other stuff with it, like save to a mailbox or forward
     # it somewhere else.
     class Gurgitate < Mailmessage
+        include Deliver
+
         # The directory you want to put mail folders into
         attr_writer :maildir
         # The path to your log file
@@ -54,42 +56,6 @@ module Gurgitate
             instance_eval(&block) if block_given?
         end
 
-        # Saves a message to +mailbox+.
-        # mailbox::
-        #   A string containing the path of the mailbox to save
-        #   the message to.  If it is of the form "=mailbox", it
-        #   saves the message to +Maildir+/+mailbox+.  Otherwise,
-        #   it simply saves the message to the file +mailbox+.
-        if false
-            def save(mailbox)
-                if mailbox[0,1]=='=' and @maildir != nil
-                    mailbox["="]=@maildir+"/"
-                end
-
-                if mailbox[0,1] != '/'
-                    log("Cannot save to relative filenames!  Saving to spool file");
-                    mailbox=spoolfile
-                end
-
-                log("Saving to mailbox "+mailbox)
-                begin
-                    File.open(mailbox,"a") do |f|
-                        f.flock(File::LOCK_EX)
-                        # Do this all at once so that it doesn't write half a
-                        # message if it's going to barf
-                        # f.print "From "+self.from+" "+Time.new.to_s+"\n"
-                        f.print self.to_s+"\n"
-                        f.flock(File::LOCK_UN)
-                    end
-                rescue SystemCallError
-                    self.log "Gack!  Something went wrong: "+$!
-                    exit 75
-                end
-            end
-        end
-
-        include Deliver
-        
         # Deletes the current message.
         def delete
             # Well, nothing here, really.
