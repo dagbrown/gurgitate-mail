@@ -22,8 +22,15 @@ Or through your F<.procmailrc> file:
     :0:
     | /path/to/gurgitate-mail
 
-(Future versions will, hopefully, be usable as a local delivery
-agent; a drop-in replacement for "deliver" or "procmail".)
+Alternatively, if you're the sysadmin at your site, or your sysadmin
+is friendly, you can use gurgitate-mail as a local delivery agent.  For
+postfix, put
+
+    mailbox_command=/opt/bin/gurgitate-mail
+
+in F</etc/postfix/main.cf>.  If you use any other MTA, and configure
+gurgitate-mail as a local delivery agent, please tell me how!  I want to
+include this in the documentation.
 
 =head1 CONFIGURATION FILE
 
