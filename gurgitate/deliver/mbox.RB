@@ -15,14 +15,14 @@ module Gurgitate
             #   it simply saves the message to the file +mailbox+.
             def self::check_mailbox(mailbox)
 
-                if File.stat(mailbox).file? then 
-                    return MBox
-                else
-                    if File.exists? mailbox
-                        return nil
-                    else
+                begin
+                    if File.stat(mailbox).file? then 
                         return MBox
+                    else
+                        return nil
                     end
+                rescue Errno::ENOENT
+                    return MBox
                 end
             end
 

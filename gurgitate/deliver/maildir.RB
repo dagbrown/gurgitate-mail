@@ -16,10 +16,14 @@ module Gurgitate
             #   the message to +Maildir+/+mailbox+.  Otherwise, it
             #   simply saves the message to the file +mailbox+.
             def self::check_mailbox(mailbox)
-                if File.stat(mailbox).directory? then
-                    if File.stat(File.join(mailbox,"cur")).directory? then
-                        return Maildir
+                begin
+                    if File.stat(mailbox).directory? then
+                        if File.stat(File.join(mailbox,"cur")).directory? then
+                            return Maildir
+                        end
                     end
+                rescue Errno::ENOENT
+                    return nil
                 end
             end
 
