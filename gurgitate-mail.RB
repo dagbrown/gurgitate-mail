@@ -37,7 +37,7 @@ module Gurgitate
         #   The text of the email-message header
         def initialize(header)
             if(header =~ /^[a-zA-Z][a-zA-Z0-9-]*:/) then
-                (name,contents)=header.split(/: /,2)
+                (name,contents)=header.split(/:\s+/,2)
 
                 raise IllegalHeader, "Empty name" \
                     if (name == "" or name == nil)
@@ -99,7 +99,8 @@ module Gurgitate
                 unix_from=""
             end
 
-            @headertext.split(/\n/).each do |h|
+            @headertext.each do |h|
+                h.chomp!
                 if(h=~/^\s+/) then
                     @lastheader << h
                 else
@@ -272,12 +273,10 @@ module Gurgitate
             @actiontaken=false
             @spooldir=spooldir
             @spoolfile=@spooldir+"/"+Etc.getlogin()
-            if(input.respond_to?(:read))
-                super(input.read)
-            else
-                super(input)
-            end
-            
+
+            input_text=""
+            input.each do |l| input_text << l end
+            super(input_text)
             instance_eval(&block) if block_given?
         end
 

@@ -1,3 +1,6 @@
+ - Made it deal correctly with headers that have tabs between the colon
+   and the data, instead of spaces (bug #154).
+
 1.2.1:
 
  - Made it NOT BLOW UP when you give it an email with a header that
