@@ -10,6 +10,7 @@ dist: tarball
 clean:
 	-rm -f $(TARGETS) 
 	-rm -f pod2htm*~~
+	-rm -rf doc
 
 tarball: $(TARGETS) INSTALL CHANGELOG
 	cd .. && tar zcvf $(TARBALL) \
@@ -34,6 +35,9 @@ gurgitate-mail.html: gurgitate-mail.pod
 
 gurgitate-mail.man: gurgitate-mail.pod
 	pod2man $< > $@
+
+doc: gurgitate-mail.rb
+	rdoc gurgitate-mail.rb
 
 README: gurgitate-mail.pod
 	pod2text $< > $@
