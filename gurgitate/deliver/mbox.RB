@@ -30,8 +30,7 @@ module Gurgitate
             def deliver_message(mailbox) 
                 File.open(mailbox,"a") do |f|
                     f.flock(File::LOCK_EX)
-                    f.seek(2)
-                    message=(if f.tell > 0 then "\n" else "" end) + to_mbox
+                    message=(if f.stat.size > 0 then "\n" else "" end) + to_mbox
                     f.print message
                     f.flock(File::LOCK_UN)
                 end
