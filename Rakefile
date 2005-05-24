@@ -83,9 +83,9 @@ task :test => :default do
 end
 
 task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 
-    install(Tarball,Webpage,0644)
-    install("CHANGELOG",Webpage+"/CHANGELOG.txt",0644)
-    install("gurgitate-mail.html",Webpage,0644)
+    File.install(Tarball,Webpage,0644)
+    File.install("CHANGELOG",Webpage+"/CHANGELOG.txt",0644)
+    File.install("gurgitate-mail.html",Webpage,0644)
 end
 
 # Should be ruby_"compile" but I can't put quote marks in method names :-)
