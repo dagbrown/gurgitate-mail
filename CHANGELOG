@@ -1,4 +1,7 @@
 1.5:
+- Made it not throw an exception on (illegal, mind) headers with 
+  underscores in their names.
+
 - Added a thing to the "filter" method so that you can say something like
 
         filter("spamc") do

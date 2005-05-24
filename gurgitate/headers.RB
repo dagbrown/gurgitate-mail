@@ -33,7 +33,11 @@ module Gurgitate
         def initialize(*header)
             name,contents=nil,nil
             if header.length == 1 then
-                if(header[0] =~ /^[a-zA-Z][a-zA-Z0-9-]*:/) then
+                # Yes, I know that RFC822 says underscore isn't a valid
+                # character in the name of a header.  That doesn't stop
+                # idiots from sending out email messages with underscores
+                # in header names.
+                if(header[0] =~ /^[a-zA-Z][a-zA-Z0-9-_]*:/) then
                     (name,contents)=header[0].split(/:\s+/,2)
 
                     raise IllegalHeader, "Empty name" \
