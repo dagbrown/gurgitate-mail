@@ -1,3 +1,6 @@
+- Added code from Bertram Scharpf to make error-in-rules handling
+  a little more graceful
+
 1.5:
 - Made it not throw an exception on (illegal, mind) headers with 
   underscores in their names.

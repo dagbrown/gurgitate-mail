@@ -154,6 +154,11 @@ module Gurgitate
           rescue ScriptError
             log "Couldn't load .gurgitate-rules: "+$!
             save(spoolfile)
-        end
-    end
-end
+          rescue Exception
+              log "Error while executing .gurgitate-rules.rb: #{$!}"
+              $@.each { |tr| log "Backtrace: #{tr}" }
+              folderstyle = MBox
+              save(spoolfile)
+          end
+      end
+  end
