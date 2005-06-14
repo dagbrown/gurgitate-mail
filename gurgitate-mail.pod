@@ -136,6 +136,14 @@ Gurgitate object containing the filtered mail.  (This is handy
 for external filters which modify email like, for example,
 SpamAssassin, which adds a spam-score header.)
 
+You can also say
+
+    filter(program) do
+        # code here
+    end
+
+and it yields the newly-created Gurgitate object to the block.
+
 =item headers
 
 This returns the headers as an object of their own.  This object
