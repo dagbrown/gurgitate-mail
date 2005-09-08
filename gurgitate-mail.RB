@@ -141,7 +141,12 @@ module Gurgitate
         end
 
         # Processes your .gurgitate-rules.rb.
-        def process(configfilespec=homedir+"/.gurgitate-rules.rb")
+        def process(configfilespec=homedir+"/.gurgitate-rules")
+            # Have a quick look around for ~/.gurgitate-rules, and
+            # if it's not there, try for .gurgitate-rules.rb instead
+            if not Filetest.exist?(configspec) then
+                configfilespec = "#{configfilespec}.rb"
+            end
             if FileTest.exist?(configfilespec) and 
                 FileTest.file?(configfilespec) and 
                 FileTest.owned?(configfilespec) and 

@@ -47,8 +47,20 @@ module Gurgitate
                 # let's default to whatever's in @folderstyle.  (I
                 # guess we'll be making a new mailbox, eh?)
 
-                self.class.instance_eval do
-                    include @folderstyle
+                if defined? @folderstyle then
+                    self.class.instance_eval do
+                        include @folderstyle
+                    end
+                else
+                    # No hints from the user either.  Let's guess!
+                    # I'll use the same heuristic that Postfix uses--if the
+                    # mailbox name ends with a /, then make it a Maildir,
+                    # otherwise make it a mail file
+                    if mailbox =~ /\/$/ then
+                        include Maildir
+                    else
+                        include MBox
+                    end
                 end
                 
             rescue MailboxFound
