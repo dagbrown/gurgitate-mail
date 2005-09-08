@@ -83,7 +83,7 @@ task :test => :default do
 end
 
 task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 
-    File.install(Tarball,Webpage,0644)
+    File.install("../#{Tarball}",Webpage,0644)
     File.install("CHANGELOG",Webpage+"/CHANGELOG.txt",0644)
     File.install("gurgitate-mail.html",Webpage,0644)
 end
