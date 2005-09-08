@@ -1,3 +1,9 @@
+1.5.1:
+
+- Made it use Postfix's heuristic for determining whether a nonexistent
+  mailbox is a mail spool or a Maildir by looking for a slash on the end
+  of the mailbox's name.
+
 - Added code from Bertram Scharpf to make error-in-rules handling
   a little more graceful
 
