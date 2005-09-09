@@ -39,6 +39,7 @@ task :default => Targets
 task :dist => :tarball
 task :tarball => Tarball
 task :release => [:tag, :tarball, :webpage]
+task :rerelease => [:untag, :tag, :tarball, :webpage]
 
 task(:clean) { 
     delete_all(*Targets+["pod2htm*~~","*.tmp",
