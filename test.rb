@@ -54,6 +54,15 @@ class TC_Header < Test::Unit::TestCase
         assert_equal(h.contents,h.value,"Contents same as value")
     end
 
+    def test_empty_header_with_extension
+        h=Gurgitate::Header.new("From:")
+        h << " fromheader@example.com"
+        assert_equal("From",h.name,"Empty extended header is From")
+        assert_equal("\n fromheader@example.com", h.contents,
+                     "Empty extended header contains all data")
+        assert_equal(h.contents, h.value, "Contents same as value")
+    end
+
     def test_changing_header
         h=Gurgitate::Header.new("From: fromheader@example.com")
         h.contents="anotherfromheader@example.com"

@@ -39,6 +39,11 @@ module Gurgitate
                 # in header names.
                 if(header[0] =~ /^[a-zA-Z][a-zA-Z0-9_-]*:/) then
                     (name,contents)=header[0].split(/:\s+/,2)
+                    if(name =~ /:$/ and contents == nil) then
+                        # It looks like someone is using Becky!
+                        name=header[0].gsub(/:$/,"")
+                        contents = ""
+                    end
 
                     raise IllegalHeader, "Empty name" \
                         if (name == "" or name == nil)

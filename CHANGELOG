@@ -1,3 +1,9 @@
+1.5.2:
+
+- Made it not blow up when it encounters a header of the form 
+  "To:\n  emailaddress@example.com" (as seen in email messages from
+  the obscure Japanese email client Becky)
+
 1.5.1:
 
 - Made it use Postfix's heuristic for determining whether a nonexistent
