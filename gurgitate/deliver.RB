@@ -48,8 +48,12 @@ module Gurgitate
                 # guess we'll be making a new mailbox, eh?)
 
                 if defined? @folderstyle then
+                    #
+                    # Careful we don't get the wrong instance variable 
+                    folderstyle=@folderstyle 
+
                     self.class.instance_eval do
-                        include @folderstyle
+                        include folderstyle
                     end
                 else
                     # No hints from the user either.  Let's guess!
