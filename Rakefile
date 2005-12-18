@@ -104,7 +104,7 @@ Modules.map do |modname|
 end
 
 file "README" => "gurgitate-mail.text" do |t|
-    t.source=t.prerequisites[0]
+    t.sources=[t.prerequisites[0]]
     Task[t.source].invoke
     File.copy(t.source, t.name, true)
 end
