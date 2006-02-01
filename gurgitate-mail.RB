@@ -116,7 +116,7 @@ module Gurgitate
 
         # Pipes the message through +program+, and returns another
         # +Gurgitate+ object containing the output of the filter
-        def filter(program)
+        def filter(program,&block)
             self.log "Filtering with "+program
             IO.popen("-","w+") do |filter|
                 if filter.nil? then
@@ -124,7 +124,7 @@ module Gurgitate
                 else
                     if fork
                         filter.close_write
-                        g=Gurgitate::Gurgitate.new(filter)
+                        g=Gurgitate.new(filter)
                         g.instance_eval(&block) if block_given?
                         return g
                     else
@@ -141,7 +141,7 @@ module Gurgitate
         end
 
         # Processes your .gurgitate-rules.rb.
-        def process(configfilespec=homedir+"/.gurgitate-rules")
+        def process(configfilespec=homedir+"/.gurgitate-rules",chain=false)
             # Have a quick look around for ~/.gurgitate-rules, and
             # if it's not there, try for .gurgitate-rules.rb instead
             if not FileTest.exist?(configfilespec) then
@@ -153,6 +153,8 @@ module Gurgitate
                 FileTest.readable?(configfilespec)
             then
                 eval File.new(configfilespec).read
+            elsif chain
+                return self
             else
                 save(spoolfile)
             end

@@ -1,3 +1,12 @@
+1.6.0:
+
+- Added site-wide gurgitate-rules-file capability
+
+1.5.3:
+
+- Fixed a problem caused by me not touching filter in way too long:
+  there were namespace and parameter problems.
+
 1.5.2:
 
 - Made it not blow up when it encounters a header of the form 
