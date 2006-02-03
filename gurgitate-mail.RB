@@ -164,17 +164,17 @@ module Gurgitate
                     File.stat(configfilespec).uid == 0 ) ) and
                 FileTest.readable?(configfilespec)
             then
-                eval File.new(configfilespec).read
+                eval File.new(configfilespec).read, nil, configfilespec
             elsif options.has_key? :chain and options[:chain] = true
                 return self
             else
                 save(spoolfile)
             end
           rescue ScriptError
-            log "Couldn't load gurgitate-rules: "+$!
+            log "Couldn't load #{configfilespec}: "+$!
             save(spoolfile)
           rescue Exception
-              log "Error while executing gurgitate-rules: #{$!}"
+              log "Error while executing #{configfilespec}: #{$!}"
               $@.each { |tr| log "Backtrace: #{tr}" }
               folderstyle = MBox
               save(spoolfile)
