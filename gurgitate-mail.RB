@@ -141,7 +141,10 @@ module Gurgitate
         end
 
         # Processes your .gurgitate-rules.rb.
-        def process(configfilespec=homedir+"/.gurgitate-rules",*options)
+        def process(configfilespec=:default,*options)
+            if configfilespec == :default
+                configfilespec=homedir+"/.gurgitate-rules"
+            end
             if options.length == 1 and Hash === options[0] then
                 options=options[0]
             elsif options.length != 0 then
@@ -158,7 +161,7 @@ module Gurgitate
                     FileTest.owned?(configfilespec) ) or
                   ( options.has_key? :system and
                     options[:system] == true and
-                    File.stat(configfile).uid == 0 ) ) and
+                    File.stat(configfilespec).uid == 0 ) ) and
                 FileTest.readable?(configfilespec)
             then
                 eval File.new(configfilespec).read
@@ -168,10 +171,10 @@ module Gurgitate
                 save(spoolfile)
             end
           rescue ScriptError
-            log "Couldn't load .gurgitate-rules: "+$!
+            log "Couldn't load gurgitate-rules: "+$!
             save(spoolfile)
           rescue Exception
-              log "Error while executing .gurgitate-rules.rb: #{$!}"
+              log "Error while executing gurgitate-rules: #{$!}"
               $@.each { |tr| log "Backtrace: #{tr}" }
               folderstyle = MBox
               save(spoolfile)
