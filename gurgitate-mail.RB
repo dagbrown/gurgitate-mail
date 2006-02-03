@@ -141,7 +141,12 @@ module Gurgitate
         end
 
         # Processes your .gurgitate-rules.rb.
-        def process(configfilespec=homedir+"/.gurgitate-rules",chain=false)
+        def process(configfilespec=homedir+"/.gurgitate-rules",*options)
+            if options.length == 1 and Hash === options[0] then
+                options=options[0]
+            elsif options.length != 0 then
+                raise ArgumentError.new("Expected hash of options")
+            end
             # Have a quick look around for ~/.gurgitate-rules, and
             # if it's not there, try for .gurgitate-rules.rb instead
             if not FileTest.exist?(configfilespec) then
@@ -149,11 +154,15 @@ module Gurgitate
             end
             if FileTest.exist?(configfilespec) and 
                 FileTest.file?(configfilespec) and 
-                FileTest.owned?(configfilespec) and 
+                ( ( not options.has_key? :system and 
+                    FileTest.owned?(configfilespec) ) or
+                  ( options.has_key? :system and
+                    options[:system] == true and
+                    File.stat(configfile).uid == 0 ) ) and
                 FileTest.readable?(configfilespec)
             then
                 eval File.new(configfilespec).read
-            elsif chain
+            elsif options.has_key? :chain and options[:chain] = true
                 return self
             else
                 save(spoolfile)
