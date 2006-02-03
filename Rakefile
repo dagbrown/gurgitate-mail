@@ -43,7 +43,7 @@ task :rerelease => [:untag, :tag, :tarball, :webpage]
 
 task(:clean) { 
     delete_all(*Targets+["pod2htm*~~","*.tmp",
-        "gurgitate-mail.txt","doc","*~"]) 
+        "gurgitate-mail.text","doc","*~"]) 
 }
 
 task :install => Targets do
