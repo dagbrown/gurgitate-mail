@@ -37,7 +37,7 @@ module Gurgitate
                 # character in the name of a header.  That doesn't stop
                 # idiots from sending out email messages with underscores
                 # in header names.
-                if(header[0] =~ /^[a-zA-Z][a-zA-Z0-9_-]*:/) then
+                if(header[0] =~ /^[a-zA-Z0-9][a-zA-Z0-9_-]*:/) then
                     (name,contents)=header[0].split(/:\s+/,2)
                     if(name =~ /:$/ and contents == nil) then
                         # It looks like someone is using Becky!

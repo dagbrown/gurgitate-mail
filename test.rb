@@ -25,6 +25,8 @@ class TC_Header < Test::Unit::TestCase
             "Contents is fromheader@example.com")
     end
 
+    # This is an illegal header that turns up in spam sometimes.
+    # Crashing when you get spam is bad.
     def test_malcapitalized_header
         h=Gurgitate::Header.new("FROM: fromheader@example.com")
         assert_equal(h.name,"From", "Badly-capitalized header is From")
@@ -32,6 +34,18 @@ class TC_Header < Test::Unit::TestCase
             "Badly-capitalized header")
         assert_equal(h.value,"fromheader@example.com", 
             "Badly-capitalized header")
+    end
+
+    # This is another illegal header that turns up in spam sometimes.
+    # Crashing when you get spam is bad.
+    def test_nonalphabetic_initial_char_header
+        h=Gurgitate::Header.new("2From: fromheader@example.com")
+        assert_equal(h.name,"2from", 
+                     "Header that starts with illegal char is 2From")
+        assert_equal(h.contents, "fromheader@example.com",
+                     "Header that starts with illegal char")
+        assert_equal(h.value, "fromheader@example.com",
+                     "Header that starts with illegal char")
     end
 
     def test_bad_headers
