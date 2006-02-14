@@ -40,8 +40,8 @@ class TC_Header < Test::Unit::TestCase
     # that.
     def test_dot_in_header
         h=Gurgitate::Header.new("From.Header: fromheader@example.com")
-        assert_equal(h.name, "From.Header", 
-                     "header with dot in it is From.Header")
+        assert_equal(h.name, "From.header", 
+                     "header with dot in it is From.header")
         assert_equal(h.contents, "fromheader@example.com",
                      "header with dot in it")
         assert_equal(h.value, "fromheader@example.com",
