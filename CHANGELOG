@@ -1,6 +1,9 @@
 1.6.0:
 
-- Added site-wide gurgitate-rules-file capability
+- Added site-wide gurgitate-rules-file capability.
+- Made it so that headers that start with a number pass through without
+  breaking stuff, which is a shame, because those are quite illegal as
+  far as I know.
 
 1.5.3:
 
