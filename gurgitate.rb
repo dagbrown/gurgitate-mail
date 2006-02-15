@@ -8,7 +8,9 @@ require "gurgitate-mail"
 GLOBAL_RULES="/etc/gurgitate-rules"
 GLOBAL_RULES_POST="/etc/gurgitate-rules-default"
 
-Gurgitate::Gurgitate.new(STDIN) .
-    process(GLOBAL_RULES,:chain => true, :system => true) .
-    process(:default, :chain => true) .
-    process(GLOBAL_RULES_POST, :system => true)
+gurgitate = Gurgitate::Gurgitate.new(STDIN)
+
+gurgitate.add_rules(GLOBAL_RULES, :system => true)
+gurgitate.add_rules(:default)
+gurgitate.add_rules(GLOBAL_RULES_POST, :system => true)
+gurgitate.process
