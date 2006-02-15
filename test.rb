@@ -48,6 +48,17 @@ class TC_Header < Test::Unit::TestCase
                      "header with dot in it")
     end
 
+    # This is another particularly horrible spamware-generated not-a-header.
+    def test_header_that_starts_with_hyphen
+        h=Gurgitate::Header.new("-From: -fromheader@example.com")
+        assert_equal(h.name, "-From",
+                     "header with leading hyphen is -From")
+        assert_equal(h.contents, "-fromheader@example.com",
+                     "header with leading hyphen")
+        assert_equal(h.value, "-fromheader@example.com",
+                     "header with leading hyphen")
+    end
+
     # This is another illegal header that turns up in spam sometimes.
     # Crashing when you get spam is bad.
     def test_nonalphabetic_initial_char_header

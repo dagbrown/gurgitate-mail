@@ -5,6 +5,7 @@
   breaking stuff, which is a shame, because those are quite illegal as
   far as I know.
 - Also, headers with a . in the *header* name should pass though.
+- ALSO, headers with a leading - in the header name, likewise.
 
 1.5.3:
 
