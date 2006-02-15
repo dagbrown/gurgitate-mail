@@ -180,9 +180,9 @@ module Gurgitate
                         folderstyle = MBox
                         save(spoolfile)
                     end
-                else
-                    save(spoolfile)
                 end
+            else
+                save(spoolfile)
             end
         end
     end
