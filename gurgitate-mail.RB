@@ -166,6 +166,7 @@ module Gurgitate
 
         # Processes your .gurgitate-rules.rb.
         def process
+            configfilespec = nil
             if @rules.size > 0
                 @rules.each do |configfilespec|
                     eval File.new(configfilespec).read, nil, configfilespec
