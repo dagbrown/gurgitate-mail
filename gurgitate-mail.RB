@@ -51,6 +51,8 @@ module Gurgitate
             @spooldir    = spooldir
             @spoolfile   = File.join(@spooldir,@passwd.name )
             @folderstyle = MBox
+            @rules       = []
+            @done        = false
 
             input_text = ""
             input.each do |l| input_text << l end
@@ -58,10 +60,34 @@ module Gurgitate
             instance_eval(&block) if block_given?
         end
 
+        def add_rules(filename, options = {})
+            if not Hash === options
+                raise ArgumentError.new("Expected hash of options")
+            end
+            if filename == :default
+                filename=homedir+"/.gurgitate-rules"
+            end
+            if not FileTest.exist?(filename)
+                filename = filename + '.rb'
+            end
+            if FileTest.exist?(filename) and
+                FileTest.file?(filename) and
+                ( ( not options.has_key? :system and
+                    FileTest.owned?(filename) ) or
+                  ( options.has_key? :system and
+                    options[:system] == true and
+                    File.stat(filename).uid == 0 ) ) and
+                FileTest.readable?(filename)
+                @rules << filename
+            else
+                log("There's a problem with #{filename}, check permissions")
+            end
+        end
+
         # Deletes the current message.
         def delete
             # Well, nothing here, really.
-            true
+            @done = true
         end
 
         # This is a neat one.  You can get any header as a method.
@@ -88,6 +114,7 @@ module Gurgitate
             IO.popen(@sendmail+" "+address,"w") do |f|
                 f.print(self.to_s)
             end
+            @done = true
         end
 
         # Writes +message+ to the log file.
@@ -108,6 +135,7 @@ module Gurgitate
             IO.popen(program,"w") do |f|
                 f.print(self.to_s)
             end
+            @done = true
             return $?>>8
           rescue SystemCallError
             save(spoolfile())
@@ -134,6 +162,7 @@ module Gurgitate
                         exit
                     end
                 end
+                @done = true
             end
           rescue SystemCallError
             save(Spoolfile)
@@ -141,32 +170,11 @@ module Gurgitate
         end
 
         # Processes your .gurgitate-rules.rb.
-        def process(configfilespec=:default,*options)
-            if configfilespec == :default
-                configfilespec=homedir+"/.gurgitate-rules"
-            end
-            if options.length == 1 and Hash === options[0] then
-                options=options[0]
-            elsif options.length != 0 then
-                raise ArgumentError.new("Expected hash of options")
-            end
-            # Have a quick look around for ~/.gurgitate-rules, and
-            # if it's not there, try for .gurgitate-rules.rb instead
-            if not FileTest.exist?(configfilespec) then
-                configfilespec = "#{configfilespec}.rb"
-            end
-            if FileTest.exist?(configfilespec) and 
-                FileTest.file?(configfilespec) and 
-                ( ( not options.has_key? :system and 
-                    FileTest.owned?(configfilespec) ) or
-                  ( options.has_key? :system and
-                    options[:system] == true and
-                    File.stat(configfilespec).uid == 0 ) ) and
-                FileTest.readable?(configfilespec)
-            then
-                eval File.new(configfilespec).read, nil, configfilespec
-            elsif options.has_key? :chain and options[:chain] = true
-                return self
+        def process
+            if @rules.size > 0
+                @rules.each do |configfilespec|
+                    eval File.new(configfilespec).read, nil, configfilespec
+                end
             else
                 save(spoolfile)
             end
