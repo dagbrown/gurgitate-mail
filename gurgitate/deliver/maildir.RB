@@ -42,7 +42,7 @@ module Gurgitate
                     filename=File.join(dir,sprintf("%.4f.%d_%d.%s",
                                                    time,$$,counter,hostname))
                     break if not File.exists?(filename)
-                    maildir_counter+=1
+                    counter+=1
                 end
                 return filename
             end
