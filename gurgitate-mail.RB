@@ -52,7 +52,6 @@ module Gurgitate
             @spoolfile   = File.join(@spooldir,@passwd.name )
             @folderstyle = MBox
             @rules       = []
-            @done        = false
 
             input_text = ""
             input.each do |l| input_text << l end
@@ -87,7 +86,6 @@ module Gurgitate
         # Deletes the current message.
         def delete
             # Well, nothing here, really.
-            @done = true
         end
 
         # This is a neat one.  You can get any header as a method.
@@ -114,7 +112,6 @@ module Gurgitate
             IO.popen(@sendmail+" "+address,"w") do |f|
                 f.print(self.to_s)
             end
-            @done = true
         end
 
         # Writes +message+ to the log file.
@@ -135,7 +132,6 @@ module Gurgitate
             IO.popen(program,"w") do |f|
                 f.print(self.to_s)
             end
-            @done = true
             return $?>>8
           rescue SystemCallError
             save(spoolfile())
@@ -162,7 +158,6 @@ module Gurgitate
                         exit
                     end
                 end
-                @done = true
             end
           rescue SystemCallError
             save(Spoolfile)

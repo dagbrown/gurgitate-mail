@@ -75,7 +75,6 @@ module Gurgitate
 
             begin
                 deliver_message(mailbox)
-                @done = true
             rescue SystemCallError
                 self.log "Gack!  Something went wrong: "+$!
                 exit 75
