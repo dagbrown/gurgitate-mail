@@ -69,8 +69,10 @@ module Gurgitate
             if not FileTest.exist?(filename)
                 filename = filename + '.rb'
             end
-            if FileTest.exist?(filename) and
-                FileTest.file?(filename) and
+            if not FileTest.exist?(filename)
+              return false
+            end
+            if FileTest.file?(filename) and
                 ( ( not options.has_key? :system and
                     FileTest.owned?(filename) ) or
                   ( options.has_key? :system and
@@ -79,7 +81,8 @@ module Gurgitate
                 FileTest.readable?(filename)
                 @rules << filename
             else
-                log("There's a problem with #{filename}, check permissions")
+                log("#{filename} has bad permissions or ownership, not using rules")
+                return false
             end
         end
 
