@@ -1,3 +1,7 @@
+1.6.x:
+
+- Fixed file permissions in the tarball
+
 1.6.0:
 
 - Added site-wide gurgitate-rules-file capability.

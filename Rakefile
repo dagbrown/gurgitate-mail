@@ -31,6 +31,8 @@ Targets = %w{gurgitate-mail.rb
              gurgitate-mail.man
              README} + Modules
 
+Releasefiles = %w{CHANGELOG INSTALL install.rb} + Targets
+
 Webpage=ENV["HOME"]+"/public_html/software/gurgitate-mail"
 Version=File.open("VERSION").read.chomp
 Tarball="gurgitate-mail-"+Version+".tar.gz"
@@ -51,10 +53,11 @@ task :install => Targets do
     Gurgitate::Install.install()
 end
 
-file Tarball => Targets + ["CHANGELOG","INSTALL","install.rb"] do |t|
+file Tarball => Releasefiles do |t|
     Dir.chdir("..") {
         puts "Creating #{Dir.pwd}/#{Tarball}..."
         files=t.prerequisites.map { |f| f.gsub(/^/,"gurgitate-mail/") }
+        File.chmod(0644, *files)
         system("tar","zcvf",Tarball,*files)
     }
 end
