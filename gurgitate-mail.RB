@@ -16,24 +16,88 @@ module Gurgitate
     class Gurgitate < Mailmessage
         include Deliver
 
+        # Instead of the usual attributes, I went with a
+        # reader-is-writer type thing (as seen quite often in Perl and
+        # C++ code) so that in your .gurgitate-rules, you can say
+        # 
+        # maildir "#{homedir}/Mail"
+        # sendmail "/usr/sbin/sendmail"
+        # spoolfile "Maildir"
+        # spooldir homedir
+        #
+        # This is because of an oddity in Ruby where, even if an
+        # accessor exists in the current object, if you say:
+        #    name = value
+        # it'll always create a local variable.  Not quite what you
+        # want when you're trying to set a config parameter.  You have
+        # to say "self.name = value", which (I think) is ugly.
+        #
+        # In the interests of promoting harmony, of course, the previous
+        # syntax will continue to work.
+        def self.attr_configparam(*syms)
+            syms.each do |sym|
+                class_eval %{
+                    def #{sym} (*vals)
+                        if vals.length == 1
+                            @#{sym} = vals[0]
+                            log "Config param #{sym} set to \#{vals[0]}"
+                        elsif vals.length == 0
+                            @#{sym}
+                        else
+                            raise ArgumentError, 
+                                "wrong number of arguments " +
+                                "(\#{vals.length} for 0 or 1)"
+                        end
+                    end
+
+                    # Don't break it for the nice people who use 
+                    # old-style accessors though.  Breaking people's
+                    # .gurgitate-rules is a bad idea.
+                    attr_writer :#{sym}
+                }
+            end
+        end
+
         # The directory you want to put mail folders into
-        attr_writer :maildir
+        attr_configparam :maildir
+
         # The path to your log file
-        attr_writer :logfile
+        attr_configparam :logfile
+
         # The full path of your "sendmail" program
-        attr_writer :sendmail
+        attr_configparam :sendmail
+
         # Your home directory
-        attr_reader :homedir 
+        attr_configparam :homedir 
+
         # Your default mail spool
-        attr_reader :spoolfile
+        attr_configparam :spoolfile
+
         # The directory where user mail spools live
-        attr_reader :spooldir
+        attr_configparam :spooldir
+
         # What kind of mailboxes you prefer
-        attr_writer :folderstyle
-        
-        # Constants
-        # Spooldir="/var/spool/mail"
-        # Spoolfile=Spooldir+"/"+Etc.getlogin()
+        # attr_configparam :folderstyle
+
+        # What kind of mailboxes you prefer
+        def folderstyle(*style)
+            if style.length == 0 then
+                style[0]
+            elsif style.length == 1 then
+                if style[0] == Maildir then
+                    spooldir homedir
+                    spoolfile File.join(spooldir,"Maildir")
+                else
+                    spooldir "/var/spool/mail"
+                    spoolfile File.join(spooldir, @passwd.name)
+                end
+            else
+                raise ArgumentError, "wrong number of arguments "+
+                                     "(#{style.length} for 0 or 1)"
+            end
+
+            @folderstyle = style[0]
+        end
 
         # Set config params to defaults, read in mail message from
         # +input+
