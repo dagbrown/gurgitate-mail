@@ -1,5 +1,8 @@
 1.7.x:
 
+- Changed it so that when you say "folderstyle Maildir", it changes the
+  default mail spool dir and mail spool file to $HOME and $HOME/Maildir
+  respectively.
 - Changed the way that config params work.  Now instead of having to say:
     self.sendmail = "/usr/sbin/sendmail"
   you can say:
