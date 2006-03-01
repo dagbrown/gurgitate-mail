@@ -1,3 +1,12 @@
+1.7.x:
+
+- Changed the way that config params work.  Now instead of having to say:
+    self.sendmail = "/usr/sbin/sendmail"
+  you can say:
+    sendmail "/usr/sbin/sendmail"
+  Sort of in the style of attr_reader and attr_writer, or in the style
+  of some other programs' config files.
+
 1.6.1:
 
 - Fixed file permissions in the tarball
