@@ -1,6 +1,8 @@
-1.6.x:
+1.6.1:
 
 - Fixed file permissions in the tarball
+- Fixed a really stupid bug with Maildir folder creation where it made invalid
+  mail directories.
 
 1.6.0:
 
