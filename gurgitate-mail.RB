@@ -40,7 +40,6 @@ module Gurgitate
                     def #{sym} (*vals)
                         if vals.length == 1
                             @#{sym} = vals[0]
-                            log "Config param #{sym} set to \#{vals[0]}"
                         elsif vals.length == 0
                             @#{sym}
                         else
