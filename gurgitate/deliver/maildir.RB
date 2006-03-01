@@ -52,7 +52,7 @@ module Gurgitate
             #   The full path of the new folder to be created
             def make_mailbox(mailbox)
                 Dir.mkdir(mailbox)
-                %w{cur,tmp,new}.each do |dir|
+                %w{cur tmp new}.each do |dir|
                     Dir.mkdir(File.join(mailbox,dir))
                 end
             end
