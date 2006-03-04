@@ -1,5 +1,7 @@
 1.6.1:
 
+- Fixed a bug introduced in the last code reorg, whereby it would forget to
+  default to saving mail to the spool
 - Fixed file permissions in the tarball
 - Fixed a really stupid bug with Maildir folder creation where it made invalid
   mail directories.
