@@ -174,6 +174,7 @@ module Gurgitate
                     begin
                         eval File.new(configfilespec).read, nil,
                             configfilespec
+                        save(spoolfile)
                     rescue ScriptError
                         log "Couldn't load #{configfilespec}: "+$!
                         save(spoolfile)
