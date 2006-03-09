@@ -53,6 +53,12 @@ contained in F</etc/gurgitate-rules-default> are run.  If that
 also doesn't return, then mail messages are saved into the default
 mail spool location.
 
+If the C<-f> option is used on the commandline, then the file 
+specified will be used and the default rules will not. The C<-f>
+option can be used more than once:
+
+    gurgitate-mail -f test-rules -f additional-rules
+
 =head1 FILTER RULES
 
 The filter rules are a series of Ruby statements, with the

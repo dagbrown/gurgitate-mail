@@ -9,6 +9,7 @@
     sendmail "/usr/sbin/sendmail"
   Sort of in the style of attr_reader and attr_writer, or in the style
   of some other programs' config files.
+- Added -f option to select rules files from the command-line
 
 1.6.3:
 

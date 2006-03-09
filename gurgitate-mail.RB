@@ -133,6 +133,9 @@ module Gurgitate
                 filename = filename + '.rb'
             end
             if not FileTest.exist?(filename)
+              if options.has_key?(:user)
+                log("#{filename} does not exist.")
+              end
               return false
             end
             if FileTest.file?(filename) and
