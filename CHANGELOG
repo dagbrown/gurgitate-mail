@@ -10,8 +10,19 @@
   Sort of in the style of attr_reader and attr_writer, or in the style
   of some other programs' config files.
 
+1.6.3:
+
+- Added documentation for the extra configuration files into the manual
+
+1.6.2:
+
+- Fixed a bug introduced in the last code reorg, whereby it would forget to
+  default to saving mail to the spool
+
 1.6.1:
 
+- Fixed a bug introduced in the last code reorg, whereby it would forget to
+  default to saving mail to the spool
 - Fixed file permissions in the tarball
 - Fixed a really stupid bug with Maildir folder creation where it made invalid
   mail directories.
