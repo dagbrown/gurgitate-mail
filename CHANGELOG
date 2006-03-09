@@ -1,5 +1,7 @@
 1.6.3:
 
+- Added documentation for the extra configuration files into the manual
+
 1.6.2:
 
 - Fixed a bug introduced in the last code reorg, whereby it would forget to

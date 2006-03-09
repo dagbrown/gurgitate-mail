@@ -32,9 +32,30 @@ in F</etc/postfix/main.cf>.  If you use any other MTA, and configure
 gurgitate-mail as a local delivery agent, please tell me how!  I want to
 include this in the documentation.
 
-=head1 CONFIGURATION FILE
+=head1 CONFIGURATION FILES
 
-F<.gurgitate-rules> is a series of Ruby statements, with the
+There are three configuration files used by gurgitate-mail: two are 
+system-wide, and the third, is the user rules file.
+
+The two system-wide configuration files are F</etc/gurgitate-rules> and
+F</etc/gurgitate-rules-default>.  These are processed before and
+after the user rules, respectively.
+
+F</etc/gurgitate-rules> is used to handle system-wide filtering
+needs: setting the default mailbox style to Maildir rather than
+the default MBox, setting the spool directory, things like that.
+
+The user configuration file is F<$HOME/.gurgitate-rules> (or,
+alternatively, F<$HOME/.gurgitate-rules.rb>.  Either work).  You
+put your own rules here.  If the user configuration file doesn't
+encounter a "return" during processing, then the additional rules
+contained in F</etc/gurgitate-rules-default> are run.  If that
+also doesn't return, then mail messages are saved into the default
+mail spool location.
+
+=head1 FILTER RULES
+
+The filter rules are a series of Ruby statements, with the
 following methods and variables available:
 
 =head2 Variables
