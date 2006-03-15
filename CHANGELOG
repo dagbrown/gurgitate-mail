@@ -1,6 +1,8 @@
 1.6.3:
 
-- Added documentation for the extra configuration files into the manual
+- Added mention of the systemwide configuration files to the manual.  Which,
+  by the way, could still use something of an overhaul.  Way too much stuff
+  is still SEKRIT.
 
 1.6.2:
 
