@@ -185,9 +185,9 @@ module Gurgitate
                         save(spoolfile)
                     end
                 end
-								if block
-									instance_eval(&block)
-								end
+                if block
+                    instance_eval(&block)
+                end
             else
                 save(spoolfile)
             end
