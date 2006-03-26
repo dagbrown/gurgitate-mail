@@ -1,9 +1,7 @@
-1.6.x:
-
-- Restore Gurgitate::Gurgitate#process() with a block
-
 1.6.3:
 
+- Restored Gurgitate::Gurgitate#process() with a block, which seemed to have
+  disappeared with the config file commotion.
 - Added mention of the systemwide configuration files to the manual.  Which,
   by the way, could still use something of an overhaul.  Way too much stuff
   is still SEKRIT.
