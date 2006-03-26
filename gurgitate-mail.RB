@@ -168,8 +168,8 @@ module Gurgitate
         end
 
         # Processes your .gurgitate-rules.rb.
-        def process
-            if @rules.size > 0
+        def process(&block)
+            if @rules.size > 0 or block
                 @rules.each do |configfilespec|
                     begin
                         eval File.new(configfilespec).read, nil,
@@ -185,6 +185,9 @@ module Gurgitate
                         save(spoolfile)
                     end
                 end
+								if block
+									instance_eval(&block)
+								end
             else
                 save(spoolfile)
             end

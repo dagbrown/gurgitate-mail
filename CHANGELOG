@@ -1,3 +1,7 @@
+1.6.x:
+
+- Restore Gurgitate::Gurgitate#process() with a block
+
 1.6.3:
 
 - Added mention of the systemwide configuration files to the manual.  Which,
