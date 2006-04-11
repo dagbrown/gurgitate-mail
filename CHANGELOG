@@ -1,10 +1,28 @@
+<<<<<<< CHANGELOG
 1.6.2:
 
 - Fixed a bug introduced in the last code reorg, whereby it would forget to
   default to saving mail to the spool
 
+=======
+1.6.3:
+
+- Restored Gurgitate::Gurgitate#process() with a block, which seemed to have
+  disappeared with the config file commotion.
+- Added mention of the systemwide configuration files to the manual.  Which,
+  by the way, could still use something of an overhaul.  Way too much stuff
+  is still SEKRIT.
+
+1.6.2:
+
+- Fixed a bug introduced in the last code reorg, whereby it would forget to
+  default to saving mail to the spool
+
+>>>>>>> 1.28.2.6
 1.6.1:
 
+- Fixed a bug introduced in the last code reorg, whereby it would forget to
+  default to saving mail to the spool
 - Fixed file permissions in the tarball
 - Fixed a really stupid bug with Maildir folder creation where it made invalid
   mail directories.

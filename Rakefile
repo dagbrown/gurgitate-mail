@@ -18,6 +18,10 @@
 #========================================================================
 
 require 'ftools'
+begin
+    require "rake/classic_namespace"
+rescue nil
+end
 
 Modules =  %w{gurgitate/deliver.rb
              gurgitate/headers.rb 
