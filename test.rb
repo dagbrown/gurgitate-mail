@@ -6,6 +6,7 @@
 
 require 'test/unit'
 require 'test/unit/ui/console/testrunner'
+require 'stringio'
 
 class TC_Header < Test::Unit::TestCase
 
@@ -489,9 +490,25 @@ EOF
     end
 end
 
+class TC_Process < Test::Unit::TestCase
+	def setup
+		m = StringIO.new("From: me\nTo: you\nSubject: test\n\nHi.")
+		@gurgitate = Gurgitate::Gurgitate.new(m)
+	end
+	
+	def test_1
+		assert_nothing_raised do
+			@gurgitate.process { break }
+			@gurgitate.process { pipe('cat > /dev/null') }
+			@gurgitate.process { return }
+		end
+	end
+end
+
 def runtests
     Test::Unit::UI::Console::TestRunner.run(TC_Header)
     Test::Unit::UI::Console::TestRunner.run(TC_Headers)
+    Test::Unit::UI::Console::TestRunner.run(TC_Process)
 end
 
 if __FILE__ == $0 then
