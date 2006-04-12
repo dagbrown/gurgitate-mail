@@ -37,7 +37,7 @@ module Gurgitate
                 # non-whitespace) crap, followed by a colon, followed by
                 # some more (printable, but can include whitespaces)
                 # crap.
-                if(header[0] =~ /^[\x21-\x7e]+:/) then
+                if(header[0] =~ /^[!-~]+:/) then
                     (name,contents)=header[0].split(/:\s+/,2)
                     if(name =~ /:$/ and contents == nil) then
                         # It looks like someone is using Becky!
