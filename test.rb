@@ -11,7 +11,8 @@ require 'stringio'
 class TC_Header < Test::Unit::TestCase
 
     def setup
-        require './gurgitate-mail'
+        $:.unshift "."
+        require 'gurgitate-mail.rb'
     end
 
     # def teardown
