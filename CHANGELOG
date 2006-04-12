@@ -1,3 +1,10 @@
+1.6.4:
+
+- Made it *really* not care what's in the headers.  This thanks to the
+  spammer who sent an email with a ">Received: " header.  Thank you,
+  Mr. Spammer, for helping to improve my code!  Also, die a horrible flaming
+  death.
+
 1.6.3:
 
 - Restored Gurgitate::Gurgitate#process() with a block, which seemed to have

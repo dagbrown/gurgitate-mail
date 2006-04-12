@@ -33,11 +33,11 @@ module Gurgitate
         def initialize(*header)
             name,contents=nil,nil
             if header.length == 1 then
-                # Yes, I know that RFC822 says underscore isn't a valid
-                # character in the name of a header.  That doesn't stop
-                # idiots from sending out email messages with underscores
-                # in header names.
-                if(header[0] =~ /^[a-zA-Z0-9-][a-zA-Z0-9_.-]*:/) then
+                # RFC822 says that a header consists of some (printable,
+                # non-whitespace) crap, followed by a colon, followed by
+                # some more (printable, but can include whitespaces)
+                # crap.
+                if(header[0] =~ /^[\x21-\x7e]+:/) then
                     (name,contents)=header[0].split(/:\s+/,2)
                     if(name =~ /:$/ and contents == nil) then
                         # It looks like someone is using Becky!
