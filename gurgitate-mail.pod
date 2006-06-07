@@ -59,6 +59,58 @@ option can be used more than once:
 
     gurgitate-mail -f test-rules -f additional-rules
 
+=head1 CONFIGURATION PARAMETERS
+
+There are several parameters that you can set to change the way that
+L<gurgitate-mail> behaves.  You set a config parameter by saying, for
+instance:
+
+    sendmail "/usr/sbin/sendmail"
+
+which sets the "sendmail" parameter to "/usr/sbin/sendmail".
+
+=over 5
+
+=item maildir
+
+The directory you want to put mail folders into.  This defaults to
+$HOME/Mail.
+
+=item logfile
+
+Where you went gurgitate-mail's log messages to go to.  The standard
+location for this is $HOME/.gurgitate.log
+
+=item sendmail
+
+The full path to the L<sendmail> program, used to deliver mail.  This
+can be any program that takes as its parameters the list of addresses
+to deliver mail to, and that takes a mail message on standard input.
+
+=item homedir
+
+The full path of your home directory.  This defaults to whatever your
+actual home directory is.
+
+=item spooldir
+
+The path where the system's mail spools goes to.  This defaults to
+"/var/spool/mail".  On a Maildir system, this should be set to the
+same as "homedir".
+
+=item spoolfile
+
+The mail spool file component of the full path of your mail spool.
+This is generally your username.  Maildir users should set this to
+"Maildir".
+
+=item folderstyle
+
+The style of folders you prefer.  This can be (at the moment) either
+MBox or Maildir.
+
+=back
+
 =head1 FILTER RULES
 
 The filter rules are a series of Ruby statements, with the
