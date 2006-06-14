@@ -1,3 +1,4 @@
+<<<<<<< CHANGELOG
 1.7.x:
 
 - Changed it so that when you say "folderstyle Maildir", it changes the
@@ -24,6 +25,34 @@
 - Fixed a bug introduced in the last code reorg, whereby it would forget to
   default to saving mail to the spool
 
+=======
+1.7.0:
+
+- Changed it so that when you say "folderstyle Maildir", it changes the
+  default mail spool dir and mail spool file to $HOME and $HOME/Maildir
+  respectively.
+- Changed the way that config params work.  Now instead of having to say:
+    self.sendmail = "/usr/sbin/sendmail"
+  you can say:
+    sendmail "/usr/sbin/sendmail"
+  Sort of in the style of attr_reader and attr_writer, or in the style
+  of some other programs' config files.
+- Added -f option to select rules files from the command-line
+
+1.6.3:
+
+- Restored Gurgitate::Gurgitate#process() with a block, which seemed to have
+  disappeared with the config file commotion.
+- Added mention of the systemwide configuration files to the manual.  Which,
+  by the way, could still use something of an overhaul.  Way too much stuff
+  is still SEKRIT.
+
+1.6.2:
+
+- Fixed a bug introduced in the last code reorg, whereby it would forget to
+  default to saving mail to the spool
+
+>>>>>>> 1.33
 1.6.1:
 
 - Fixed a bug introduced in the last code reorg, whereby it would forget to

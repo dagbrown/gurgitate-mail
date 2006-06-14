@@ -49,6 +49,14 @@ class TC_Header < Test::Unit::TestCase
                      "header with dot in it")
     end
 
+    # Dammit!  My new "anything goes" header parser was parsing too much
+    def test_delivered_to
+        h=Gurgitate::Header.new("Delivered-To: dagbrown@example.com")
+        assert_equal("Delivered-To", h.name)
+        assert_equal "dagbrown@example.com", h.contents
+        assert_equal "dagbrown@example.com", h.value
+    end
+
     # This is another particularly horrible spamware-generated not-a-header.
     def test_header_that_starts_with_hyphen
         h=Gurgitate::Header.new("-From: -fromheader@example.com")
