@@ -1,3 +1,7 @@
+1.7.1:
+
+- Fixed Yet Another Header Parsing Bug[tm]
+
 1.7.0:
 
 - Changed it so that when you say "folderstyle Maildir", it changes the
