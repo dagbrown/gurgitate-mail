@@ -50,7 +50,7 @@ task :default => Targets
 task :dist => [ :tarball, :gem ]
 task :tarball => Tarball
 task :gem => Gemfile
-task :release => [:tag, :tarball, :webpage]
+task :release => [:tag, :dist, :webpage]
 task :rerelease => [:untag, :tag, :tarball, :webpage]
 
 
