@@ -49,9 +49,12 @@ Gemfile="gurgitate-mail-"+Version+".gem"
 task :default => Targets
 task :dist => [ :tarball, :gem ]
 task :tarball => Tarball
-task :gem => Gemfile
 task :release => [:tag, :dist, :webpage]
 task :rerelease => [:untag, :tag, :tarball, :webpage]
+
+task :gem => Gemfile do
+    File.move Gemfile, ".."
+end
 
 
 task :clean => :gem_cleanup do
@@ -63,7 +66,7 @@ task :gem_cleanup do
     delete_all "bin"
     delete_all "lib"
     delete_all "man"
-    delete_all Gemfile
+    delete_all "*.gem"
 end
 
 file Gemfile => [ Gemspec, :gem_install ] do
@@ -116,7 +119,8 @@ task :test => :default do
 end
 
 task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 
-    File.install("../#{Tarball}",Webpage,0644)
+    File.install(File.join("..",Tarball),Webpage,0644)
+    File.install(File.join("..",Gemfile), Webpage, 0644)
     File.install("CHANGELOG",Webpage+"/CHANGELOG.txt",0644)
     File.install("gurgitate-mail.html",Webpage,0644)
 end
