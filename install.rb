@@ -7,39 +7,54 @@ module Gurgitate
     Package = "gurgitate-mail"
 
     class Install
-        def Install.install()
+        def self.mkdir(d)
+            print "Creating #{d}..."
+            begin
+                Dir.mkdir(d)
+                print "\n"
+            rescue Errno::EEXIST
+                if FileTest.directory? d
+                    puts "no need, it's already there."
+                else
+                    puts "there's something else there already."
+                    raise
+                end
+            rescue Errno::ENOENT
+                puts "its parent doesn't exist!"
+                raise
+            end
+        end
+
+        def self.install(prefix=nil)
             include Config
 
-            version = CONFIG["MAJOR"] + "." + CONFIG["MINOR"]
-            sitedir = CONFIG["sitedir"]
-            bindir  = CONFIG["bindir"]
-            mandir  = CONFIG["mandir"] + "/man1"
-            dest    = File.join(sitedir,version)
+            if prefix then
+                bindir = File.join prefix, "bin"; mkdir bindir
+                dest   = File.join prefix, "lib"; mkdir dest
+                mkdir File.join prefix, "man"
+                mandir = File.join prefix, "man", "man1"; mkdir mandir
+            else
+                version = CONFIG["MAJOR"] + "." + CONFIG["MINOR"]
+                sitedir = CONFIG["sitedir"]
+                bindir  = CONFIG["bindir"]
+                mandir  = File.join(CONFIG["mandir"],"man1")
+                dest    = File.join(sitedir,version)
+            end
+
             destgur = File.join(dest,"gurgitate")
             destdel = File.join(destgur,"deliver")
 
             print "Installing #{Package}.rb in #{dest}...\n"
             File.install("#{Package}.rb", dest, 0644)
             
-            print "Creating #{destgur}..."
-            begin
-                Dir.mkdir(destgur)
-                print "\n"
-            rescue Errno::EEXIST
-                puts "no need, it's already there."
-            end
+            mkdir destgur
             Dir.glob(File.join("gurgitate","*.rb")).each { |f|
                 puts "Installing #{f} in #{destgur}..."
                 File.install(f,destgur)
             }
 
-            print "Creating #{destdel}..."
-            begin
-                Dir.mkdir(destdel)
-                print "\n"
-            rescue Errno::EEXIST
-                puts "no need, it's already there."
-            end
+            mkdir destdel
+
             Dir.glob(File.join(File.join("gurgitate","deliver"),"*.rb")).each {
             |f|
                 puts "Installing #{f} in #{destdel}..."
