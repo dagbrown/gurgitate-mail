@@ -23,6 +23,8 @@ begin
 rescue nil
 end
 
+Package = "gurgitate-mail"
+
 Modules =  %w{gurgitate/deliver.rb
              gurgitate/headers.rb 
              gurgitate/mailmessage.rb
@@ -35,35 +37,58 @@ Targets = %w{gurgitate-mail.rb
              gurgitate-mail.man
              README} + Modules
 
+Gemspec = "#{Package}.gemspec"
+
 Releasefiles = %w{CHANGELOG INSTALL install.rb} + Targets
 
 Webpage=ENV["HOME"]+"/public_html/software/gurgitate-mail"
 Version=File.open("VERSION").read.chomp
 Tarball="gurgitate-mail-"+Version+".tar.gz"
+Gemfile="gurgitate-mail-"+Version+".gem"
 
 task :default => Targets
-task :dist => :tarball
+task :dist => [ :tarball, :gem ]
 task :tarball => Tarball
+task :gem => Gemfile
 task :release => [:tag, :tarball, :webpage]
 task :rerelease => [:untag, :tag, :tarball, :webpage]
 
-task(:clean) { 
+
+task :clean => :gem_cleanup do
     delete_all(*Targets+["pod2htm*~~","*.tmp",
         "gurgitate-mail.text","doc","*~"]) 
-}
+end
+
+task :gem_cleanup do
+    delete_all "bin"
+    delete_all "lib"
+    delete_all "man"
+    delete_all Gemfile
+end
+
+file Gemfile => [ Gemspec, :gem_install ] do
+    require "rubygems/builder"
+    gemspec = eval File.read(Gemspec)
+    Gem::Builder.new(gemspec).build
+end
+
+task :gem_install => Targets do
+    require "install"
+    Gurgitate::Install.install "."
+end
 
 task :install => Targets do
     require "install"
-    Gurgitate::Install.install()
+    Gurgitate::Install.install
 end
 
 file Tarball => Releasefiles do |t|
-    Dir.chdir("..") {
+    Dir.chdir("..") do
         puts "Creating #{Dir.pwd}/#{Tarball}..."
         files=t.prerequisites.map { |f| f.gsub(/^/,"gurgitate-mail/") }
         File.chmod(0644, *files)
         system("tar","zcvf",Tarball,*files)
-    }
+    end
 end
 
 task :tag => "VERSION" do
@@ -123,12 +148,14 @@ end
 end
 
 ['man'].each do |s|
-    rule('.'+s => '.pod') { |t| run "pod2#{s} --center=\"Gurgitate-Mail\" #{t.source} > #{t.name}" }
+    rule('.'+s => '.pod') do |t| 
+        run "pod2#{s} --center=\"Gurgitate-Mail\" #{t.source} > #{t.name}" 
+    end
 end
 
 #------------------------------------------------------------------------
 # Apparently rake/contrib/sys.rb is deprecated in favor of ftools, but
-# ftools doesn't have these to really handy methods, so I'm stealing 'em.
+# ftools doesn't have these two really handy methods, so I'm stealing 'em.
 #------------------------------------------------------------------------
 
 def run(cmd)
