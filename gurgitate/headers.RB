@@ -132,6 +132,11 @@ module Gurgitate
 
             @headers_changed=false
 
+            # Get the envelope From information.  This comes with a
+            # whole category of rants: this information is absurdly hard
+            # to get your hands on.  The best you can manage is a sort
+            # of educated guess.
+            #
             # Okay, now worry about the "From foo@bar" line.  If it's
             # not there, then make one up from the Return-Path:
             # header.  If there isn't a "Return-Path:" header (then I
@@ -199,6 +204,13 @@ module Gurgitate
         def []=(name,value)
             @headers_changed = true
             @headers[name]=HeaderBag.new([Header.new(name,value)])
+        end
+
+        # Who the message is to (the envelope to)
+        #
+        # Yet another bucket of rants.  Unix mail sucks.
+        def to
+            return @headers["X-Original-To"] || nil
         end
 
         # Who the message is from (the envelope from)
