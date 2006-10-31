@@ -126,7 +126,7 @@ module Gurgitate
 
             input_text = ""
             input.each do |l| input_text << l end
-            super(input_text, recipient || nil, sender || nil)
+            super(input_text, recipient, sender)
             instance_eval(&block) if block_given?
         end
 
