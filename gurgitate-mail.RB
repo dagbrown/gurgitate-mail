@@ -103,6 +103,10 @@ module Gurgitate
         # input::
         #   Either the text of the email message in RFC-822 format,
         #   or a filehandle where the email message can be read from
+        # recipient::
+        #   The contents of the envelope recipient parameter
+        # sender::
+        #   The envelope sender parameter
         # spooldir::
         #   The location of the mail spools directory.
         def initialize(input=nil,
@@ -116,15 +120,13 @@ module Gurgitate
             @logfile     = File.join(@passwd.dir,".gurgitate.log")
             @sendmail    = "/usr/lib/sendmail"
             @spooldir    = spooldir
-            @recipient   = recipient
-            @sender      = sender
             @spoolfile   = File.join(@spooldir,@passwd.name )
             @folderstyle = MBox
             @rules       = []
 
             input_text = ""
             input.each do |l| input_text << l end
-            super(input_text)
+            super(input_text, recipient || nil, sender || nil)
             instance_eval(&block) if block_given?
         end
 
