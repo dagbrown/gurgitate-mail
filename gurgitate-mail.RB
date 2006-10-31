@@ -105,13 +105,19 @@ module Gurgitate
         #   or a filehandle where the email message can be read from
         # spooldir::
         #   The location of the mail spools directory.
-        def initialize(input=nil,spooldir="/var/spool/mail",&block)
+        def initialize(input=nil,
+                       recipient=nil,
+                       sender=nil, 
+                       spooldir="/var/spool/mail",
+                       &block)
             @passwd      = Etc.getpwuid
             @homedir     = @passwd.dir;
             @maildir     = File.join(@passwd.dir,"Mail")
             @logfile     = File.join(@passwd.dir,".gurgitate.log")
             @sendmail    = "/usr/lib/sendmail"
             @spooldir    = spooldir
+            @recipient   = recipient
+            @sender      = sender
             @spoolfile   = File.join(@spooldir,@passwd.name )
             @folderstyle = MBox
             @rules       = []
