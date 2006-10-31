@@ -31,10 +31,11 @@ module Gurgitate
         # custom accessors
     
         # Returns the UNIX "from" line
-        def from; @headers.from; end
+        def from; @sender || @headers.from; end
 
         # Returns all the candidates for a "to" line
-        def to; @headers["To","Cc"]; end
+        def to; @recipient || @headers["To", "Cc"]; end
+        # def to; @headers["To","Cc"]; end
 
         # Returns the formatted mail message
         def to_s; @headers.to_s + @body; end
