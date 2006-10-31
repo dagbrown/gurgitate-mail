@@ -3,7 +3,9 @@ require 'test/unit/ui/console/testrunner'
 require 'stringio'
 
 class TC_Process < Test::Unit::TestCase
+
 	def setup
+        require "./gurgitate-mail"
 		m = StringIO.new("From: me\nTo: you\nSubject: test\n\nHi.")
 		@gurgitate = Gurgitate::Gurgitate.new(m)
 	end
