@@ -1,7 +1,9 @@
-1.8.x:
+1.8.0:
 
 - Let you (only TEN FREAKIN' YEARS LATE) explicitly specify sender and
   receivers on the command line.
+- Added methods (sub and sub!) to HeaderBag to allow you to alter the contents
+  of headers
 
 1.7.2:
 
