@@ -29,6 +29,10 @@ end
 
 mail_recipients = opts.parse(ARGV)
 
+if mail_recipients.length == 0 then
+    mail_recipients = nil
+end
+
 gurgitate = Gurgitate::Gurgitate.new(STDIN, mail_recipients, mail_sender)
 
 if commandline_files.length > 0

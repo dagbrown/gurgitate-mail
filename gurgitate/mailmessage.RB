@@ -15,12 +15,14 @@ module Gurgitate
         # The body of the message
         attr_accessor :body
 
-        def initialize(text)
+        def initialize(text, recipient=nil, sender=nil)
             (@headertext,@body)=text.split(/^$/,2)
             fromregex=/([^ ]+@[^ ]+) \(.*\)|[^<][<](.*@.*)[>]|([^ ]+@[^ ]+)/;
             @headers=Headers.new(@headertext);
             fromregex.match(@headers["From"][0].contents);
             @from=$+
+            @recipient = recipient
+            @sender = sender
         end
 
         # Returns the header +name+

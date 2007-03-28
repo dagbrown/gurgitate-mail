@@ -1,3 +1,21 @@
+1.8.2:
+
+- Fixed a bug discovered by TheWordNerd where gurgitate was writing to
+  the default spool after every config file was processed, instead of
+  holding off until all of them had gone through.
+
+1.8.1:
+
+- Whoops!  Fixed a bug (thanks tchan!) in argument parsing that was causing
+  to parsing to break.
+
+1.8.0:
+
+- Let you (only TEN FREAKIN' YEARS LATE) explicitly specify sender and
+  receivers on the command line.
+- Added methods (sub and sub!) to HeaderBag to allow you to alter the contents
+  of headers
+
 1.7.2:
 
 - Added gem support
