@@ -1,3 +1,9 @@
+1.8.2:
+
+- Fixed a bug discovered by TheWordNerd where gurgitate was writing to
+  the default spool after every config file was processed, instead of
+  holding off until all of them had gone through.
+
 1.8.1:
 
 - Whoops!  Fixed a bug (thanks tchan!) in argument parsing that was causing
