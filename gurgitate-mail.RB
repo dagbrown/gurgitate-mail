@@ -81,7 +81,7 @@ module Gurgitate
         # What kind of mailboxes you prefer
         def folderstyle(*style)
             if style.length == 0 then
-                style[0]
+                @folderstyle
             elsif style.length == 1 then
                 if style[0] == Maildir then
                     spooldir homedir
@@ -90,12 +90,12 @@ module Gurgitate
                     spooldir "/var/spool/mail"
                     spoolfile File.join(spooldir, @passwd.name)
                 end
+                @folderstyle = style[0]
             else
                 raise ArgumentError, "wrong number of arguments "+
                                      "(#{style.length} for 0 or 1)"
             end
-
-            @folderstyle = style[0]
+            @folderstyle
         end
 
         # Set config params to defaults, read in mail message from
@@ -103,6 +103,10 @@ module Gurgitate
         # input::
         #   Either the text of the email message in RFC-822 format,
         #   or a filehandle where the email message can be read from
+        # recipient::
+        #   The contents of the envelope recipient parameter
+        # sender::
+        #   The envelope sender parameter
         # spooldir::
         #   The location of the mail spools directory.
         def initialize(input=nil,
@@ -116,15 +120,13 @@ module Gurgitate
             @logfile     = File.join(@passwd.dir,".gurgitate.log")
             @sendmail    = "/usr/lib/sendmail"
             @spooldir    = spooldir
-            @recipient   = recipient
-            @sender      = sender
             @spoolfile   = File.join(@spooldir,@passwd.name )
             @folderstyle = MBox
             @rules       = []
 
             input_text = ""
             input.each do |l| input_text << l end
-            super(input_text)
+            super(input_text, recipient, sender)
             instance_eval(&block) if block_given?
         end
 
@@ -246,7 +248,6 @@ module Gurgitate
                     begin
                         eval File.new(configfilespec).read, nil,
                             configfilespec
-                        save(spoolfile)
                     rescue ScriptError
                         log "Couldn't load #{configfilespec}: "+$!
                         save(spoolfile)
@@ -260,6 +261,8 @@ module Gurgitate
                 if block
                     instance_eval(&block)
                 end
+                log "Mail not covered by rules, saving to default spool"
+                save(spoolfile)
             else
                 save(spoolfile)
             end

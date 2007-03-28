@@ -1,14 +1,9 @@
 #!/opt/bin/ruby -w
 
-#------------------------------------------------------------------------
-# 
-#------------------------------------------------------------------------
-
 module Gurgitate
     class IllegalHeader < RuntimeError ; end
 
     # A little class for a single header
-
     class Header
         # The name of the header
         attr_accessor :name
@@ -89,6 +84,25 @@ module Gurgitate
                 y or ( ( x =~ regex ) != nil )
             end
         end
+
+        def sub!(regex, replacement)
+            each do |header|
+                header.contents = header.contents.sub regex, replacement
+            end
+            p self
+        end
+        
+        def sub(regex, replacement)
+            ::Gurgitate::HeaderBag.new(
+                self.map do |header|
+                    ::Gurgitate::Header.new(
+                        "#{header.name}: " + header.contents.sub(regex, 
+                                                                 replacement)
+                    )
+                end
+            )
+        end
+
     end
 
     # A slightly bigger class for all of a message's headers

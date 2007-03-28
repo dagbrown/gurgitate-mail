@@ -31,7 +31,7 @@ module Gurgitate
             if prefix then
                 bindir = File.join prefix, "bin"; mkdir bindir
                 dest   = File.join prefix, "lib"; mkdir dest
-                mkdir File.join prefix, "man"
+                mkdir File.join(prefix, "man")
                 mandir = File.join prefix, "man", "man1"; mkdir mandir
             else
                 version = CONFIG["MAJOR"] + "." + CONFIG["MINOR"]
