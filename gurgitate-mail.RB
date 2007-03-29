@@ -86,6 +86,7 @@ module Gurgitate
                 if style[0] == Maildir then
                     spooldir homedir
                     spoolfile File.join(spooldir,"Maildir")
+                    maildir spoolfile
                 else
                     spooldir "/var/spool/mail"
                     spoolfile File.join(spooldir, @passwd.name)
