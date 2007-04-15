@@ -256,7 +256,12 @@ module Gurgitate
                         log "Error while executing #{configfilespec}: #{$!}"
                         $@.each { |tr| log "Backtrace: #{tr}" }
                         folderstyle = MBox
-                        save(spoolfile)
+                        begin 
+                            save(spoolfile)
+                        rescue
+                            log "Last-ditch save to spoolfile failed"
+                            exit 75
+                        end
                     end
                 end
                 if block
