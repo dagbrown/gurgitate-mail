@@ -40,7 +40,7 @@ module Gurgitate
         # def to; @headers["To","Cc"]; end
 
         # Returns the formatted mail message
-        def to_s; @headers.to_s + @body; end
+        def to_s; @headers.to_s + ( @body || ""); end
 
         # Returns the mail message formatted for mbox
         def to_mbox; @headers.to_mbox + @body; end

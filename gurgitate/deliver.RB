@@ -25,7 +25,11 @@ module Gurgitate
         def save(mailbox)
 
             if mailbox[0,1]=='=' and @maildir != nil then
-                mailbox["="]=@maildir+"/"
+                if @folderstyle == Maildir and mailbox !~ /^=\./ then
+                    mailbox["="]=@maildir+"/."
+                else
+                    mailbox["="]=@maildir+"/"
+                end
             end
 
             if mailbox[0,1] != '/' then
