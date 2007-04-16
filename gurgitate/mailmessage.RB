@@ -7,22 +7,34 @@
 require 'gurgitate/headers'
 
 module Gurgitate
-    # A complete mail message.
 
+    # A complete mail message.
     class Mailmessage
+
+        Fromregex=/([^ ]+@[^ ]+) \(.*\)|[^<][<](.*@.*)[>]|([^ ]+@[^ ]+)/;
+
         # The headers of the message
         attr_reader :headers
         # The body of the message
         attr_accessor :body
 
-        def initialize(text, recipient=nil, sender=nil)
-            (@headertext,@body)=text.split(/^$/,2)
-            fromregex=/([^ ]+@[^ ]+) \(.*\)|[^<][<](.*@.*)[>]|([^ ]+@[^ ]+)/;
-            @headers=Headers.new(@headertext);
-            fromregex.match(@headers["From"][0].contents);
-            @from=$+
-            @recipient = recipient
-            @sender = sender
+        # The envelope sender and recipient, if anyone thought to
+        # mention them to us.
+        attr_accessor :sender
+        attr_accessor :recipient
+
+        def initialize(text=nil, recipient=nil, sender=nil)
+            if text
+                (@headertext,@body)=text.split(/^$/,2)
+                @headers=Headers.new(@headertext);
+                Fromregex.match(@headers["From"][0].contents);
+                @from=$+
+                @recipient = recipient
+                @sender = sender
+            else
+                @headers = Headers.new
+                @body = ""
+            end
         end
 
         # Returns the header +name+
