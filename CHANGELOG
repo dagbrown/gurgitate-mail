@@ -1,3 +1,10 @@
+1.8.3:
+
+- Added an "exit 75 (TEMPFAIL)" for when it tries its best to deliver a mail
+  message anywhere at all and fails no matter how hard it tries.  With a
+  sensible MTA, this should result in the message being requeued and
+  reprocessed later.
+
 1.8.2:
 
 - Fixed a bug discovered by TheWordNerd where gurgitate was writing to
