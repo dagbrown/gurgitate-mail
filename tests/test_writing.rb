@@ -31,4 +31,8 @@ class TC_Writing < Test::Unit::TestCase
             mess.headers.to_s.split(/\n/)
     end
 
+    def test_initialization_headers_and_body
+        mess = Gurgitate::Mailmessage.create "This is a test", :from => "test@test", :to => "test2@test"
+        assert_equal "This is a test", mess.body
+    end
 end

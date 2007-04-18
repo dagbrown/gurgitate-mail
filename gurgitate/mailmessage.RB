@@ -58,7 +58,7 @@ module Gurgitate
 
         def initialize(text=nil, recipient=nil, sender=nil)
             if text
-                (@headertext,@body)=text.split(/^$/,2)
+                (@headertext,@body)=text.split(/\n\n/,2)
                 @headers=Headers.new(@headertext);
                 Fromregex.match(@headers["From"][0].contents);
                 @from=$+
@@ -85,7 +85,7 @@ module Gurgitate
         # def to; @headers["To","Cc"]; end
 
         # Returns the formatted mail message
-        def to_s; @headers.to_s + ( @body || ""); end
+        def to_s; @headers.to_s + "\n\n" + ( @body || ""); end
 
         # Returns the mail message formatted for mbox
         def to_mbox; @headers.to_mbox + @body; end
