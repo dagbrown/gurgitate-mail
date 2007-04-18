@@ -24,4 +24,11 @@ class TC_Writing < Test::Unit::TestCase
         mess.headers["To"]   = "test2@test2"
         assert_equal "From: test@test\nTo: test2@test2",  mess.headers.to_s
     end
+
+    def test_initialization_headers_only
+        mess = Gurgitate::Mailmessage.create :from => "test@test", :to => "test2@test2"
+        assert_equal [ "From: test@test", "To: test2@test2" ], 
+            mess.headers.to_s.split(/\n/)
+    end
+
 end

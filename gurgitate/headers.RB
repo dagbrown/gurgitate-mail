@@ -218,15 +218,27 @@ module Gurgitate
         def initialize(headertext=nil,sender=nil, recipient=nil)
             @headers = Hash.new(nil)
 
-            if headertext
-                @unix_from, @headertext = figure_out_from_line headertext
-                parse_headers if @headertext
+            if Hash === headertext
+                @headers_changed = true
+                headertext.each_key do |key|
 
-                if sender
-                    @from = sender
-                    @unix_from="From "+self.from+" "+Time.new.to_s;
-                else
-                    guess_sender
+                    headername = key.to_s.gsub("_","-")
+
+                    header=Header.new(headername, headertext[key])
+                    @headers[header.name] ||= HeaderBag.new;
+                    @headers[header.name].push(header)
+                end
+            else
+                if headertext
+                    @unix_from, @headertext = figure_out_from_line headertext
+                    parse_headers if @headertext
+
+                    if sender
+                        @from = sender
+                        @unix_from="From "+self.from+" "+Time.new.to_s;
+                    else
+                        guess_sender
+                    end
                 end
             end
         end
@@ -312,9 +324,9 @@ module Gurgitate
         # the "From " line
         def to_s
             if @headers_changed then
-                return @headers.collect { |n,h|
-                    h.collect { |h| h.to_s }.join("\n")
-                }.join("\n")
+                return @headers.map do |n,h|
+                    h.map do |h| h.to_s end.join("\n")
+                end.join("\n")
             else
                 return @headertext
             end
