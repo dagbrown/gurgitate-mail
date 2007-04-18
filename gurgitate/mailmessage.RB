@@ -35,7 +35,7 @@ module Gurgitate
                 options = args[0]
             end
 
-            options = options.clone  #  juuust in case
+            options = options.clone # just in case, since I'm meddling with it
             message = self.new
 
             message.instance_eval do
@@ -44,8 +44,8 @@ module Gurgitate
                 end
 
                 %w/sender recipient body/.each do |key|
-                    if options.has_key? key
-                        instance_variable_set("@#{key}", options[key])
+                    if options.has_key? key.to_sym
+                        instance_variable_set("@#{key}", options[key.to_sym])
                         options.delete key
                     end
                 end

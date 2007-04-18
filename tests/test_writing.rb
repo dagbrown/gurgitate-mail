@@ -32,7 +32,25 @@ class TC_Writing < Test::Unit::TestCase
     end
 
     def test_initialization_headers_and_body
-        mess = Gurgitate::Mailmessage.create "This is a test", :from => "test@test", :to => "test2@test"
+        mess = Gurgitate::Mailmessage.create "This is a test", 
+            :from => "test@test", 
+            :to => "test2@test"
         assert_equal "This is a test", mess.body
+    end
+
+    def test_initialization_headers_body_in_initialization_hash
+        mess = Gurgitate::Mailmessage.create :body => "This is a test", 
+            :from => "test@test", 
+            :to => "test2@test"
+        assert_equal "This is a test", mess.body
+    end
+
+    def test_creation_round_trip
+        mess = Gurgitate::Mailmessage.create "This is a test", 
+            :from => "test@test",
+            :to => "test2@test2",
+            :subject => "Test subject"
+        reparsed_mess = Gurgitate::Mailmessage.new(mess.to_s)
+        assert_equal reparsed_mess.to_s, mess.to_s
     end
 end
