@@ -115,7 +115,13 @@ end
 
 task :test => :default do
     require './test'
-    runtests
+
+    testcases = Dir[File.join("tests","test_*")].map do |file|
+        load file
+        eval("TC_" + File.basename(file,".rb").sub(/^test_/,'').capitalize)
+    end
+
+    runtests testcases
 end
 
 task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 

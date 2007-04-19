@@ -312,7 +312,7 @@ EOF
         h.from="anotherfromline@example.com"
         assert_equal("anotherfromline@example.com",h.from,
             "Envelope from correctly changed")
-        assert_match(/^From anotherfromline@example.com #{t}/,
+        assert_match(/^From anotherfromline@example.com #{Regexp.escape(t)}/,
             h.to_mbox, "Envelope from changed in finished product")
     end
 
