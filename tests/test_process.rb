@@ -17,5 +17,9 @@ class TC_Process < Test::Unit::TestCase
 			@gurgitate.process { return }
 		end
 	end
+
+    def test_2
+        assert_equal("From: me",@gurgitate.header("From"))
+    end
 end
 

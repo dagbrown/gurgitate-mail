@@ -60,6 +60,17 @@ EOF
         assert_equal("fromheader@example.com",h["From"][0].contents)
     end
 
+    def test_sender_and_recipient
+        h = Gurgitate::Headers.new(<<'EOF', "sender@example.com", "recipient@example.com")
+From: fromheader@example.com
+To: toheader@example.com
+Subject: Subject
+EOF
+        assert_equal('sender@example.com', h.from)
+        assert_equal('recipient@example.com', h.to)
+    end
+                                   
+
     def test_multiple_headers
         h=Gurgitate::Headers.new(<<'EOF'
 From fromline@example.com Sat Sep 27 12:20:25 PDT 2003

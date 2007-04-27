@@ -168,6 +168,12 @@ module Gurgitate
             # used, then I _particularly_ hope that things never get so
             # bad that poor gurgitate has to use the From: header as a
             # source of authoritative information on anything.
+            #
+            # And then after all that fuss, if we're delivering to a
+            # Maildir, I have to get rid of it.  And sometimes the MTA
+            # gives me a mbox-style From line and sometimes it doesn't.
+            # It's annoying, but I have no choice but to Just Deal With
+            # It.
             if @unix_from then
                 # If it is there, then grab the email address in it and
                 # use that as our official "from".
@@ -216,6 +222,8 @@ module Gurgitate
         # headertext::
         #   The text of the message headers.
         def initialize(headertext=nil,sender=nil, recipient=nil)
+            @from    = sender
+            @to      = recipient
             @headers = Hash.new(nil)
 
             if Hash === headertext
@@ -233,7 +241,7 @@ module Gurgitate
                     @unix_from, @headertext = figure_out_from_line headertext
                     parse_headers if @headertext
 
-                    if sender
+                    if sender # then don't believe the mbox separator
                         @from = sender
                         @unix_from="From "+self.from+" "+Time.new.to_s;
                     else
@@ -269,7 +277,7 @@ module Gurgitate
         #
         # Yet another bucket of rants.  Unix mail sucks.
         def to
-            return @headers["X-Original-To"] || nil
+            return @to || @headers["X-Original-To"] || nil
         end
 
         # Who the message is from (the envelope from)
