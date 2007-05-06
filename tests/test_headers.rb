@@ -381,3 +381,33 @@ EOF
     end
 end
 
+
+class TC_Meddling_With_Headers < Test::Unit::TestCase
+    def setup
+        @message = <<'EOF'
+From: fromline@example.com
+To: toline@example.com
+Subject: Subject Line
+EOF
+
+        @sender = "sender@example.com"
+        @recipient = "recipient@example.com"
+
+        @headers = Gurgitate::Headers.new @message, @sender, @recipient
+    end
+
+    def test_match
+        assert @headers.match "From", /example.com/
+    end
+
+    def test_nomatch
+        assert !@headers.match("From", /lart.ca/)
+    end
+
+    def test_match_string
+        assert_nothing_raised do
+            @headers.match "From", "example.com"
+        end
+    end
+end
+

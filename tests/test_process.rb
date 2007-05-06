@@ -50,7 +50,7 @@ class TC_Process < Test::Unit::TestCase
         assert_equal("From: me",@gurgitate.header("From"))
         assert_equal("To: you", @gurgitate.header("To"))
         assert_equal("Subject: test", @gurgitate.header("Subject"))
-        assert_equal("Hi.", @gurgitate.body)
+        assert_equal("Hi.", @gurgitate.body, "Message body is wrong")
     end
 
     def test_message_written_correctly
@@ -64,11 +64,10 @@ class TC_Process < Test::Unit::TestCase
             mess = Gurgitate::Mailmessage.new(File.read(@spoolfile))
         end
 
-        assert_equal("From: me", mess.header("From"))
-        assert_equal("To: you", mess.header("To"))
-        assert_equal("Subject: test", mess.header("Subject"))
-        assert_equal("Hi.", mess.body)
-        puts File.read(@spoolfile)
+        assert_equal("From: me", mess.header("From"), "From header is wrong")
+        assert_equal("To: you", mess.header("To"), "To header is wrong")
+        assert_equal("Hi.", mess.body, "Body is wrong")
+        assert_equal("Subject: test", mess.header("Subject"), "Subject header wrong")
     end
 end
 
