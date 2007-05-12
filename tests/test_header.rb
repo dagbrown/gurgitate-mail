@@ -26,6 +26,22 @@ class TC_Header < Test::Unit::TestCase
             "Contents is fromheader@example.com")
     end
 
+    def test_canonicalize_crashing
+        String.class_eval do
+            alias old_capitalize capitalize
+            def capitalize
+                raise RuntimeError
+            end
+        end
+
+        test_simple_header
+
+        String.class_eval do
+            alias capitalize old_capitalize
+        end
+    end
+
+
     # This is an illegal header that turns up in spam sometimes.
     # Crashing when you get spam is bad.
     def test_malcapitalized_header

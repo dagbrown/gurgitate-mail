@@ -19,6 +19,8 @@ testcases = Dir[File.join("tests","test_*")].map do |file|
     eval("TC_" + File.basename(file,".rb").sub(/^test_/,'').capitalize)
 end
 
+p __FILE__
+p $0
 if __FILE__ == $0 then
     if(ARGV[0] == '-c')
         require 'coverage'
