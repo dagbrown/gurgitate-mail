@@ -40,10 +40,8 @@ module Gurgitate
             begin
                 [MBox,Maildir].each do |mod|
                     if mod::check_mailbox(mailbox) then
-                        self.class.instance_eval do 
-                            include mod
-                            raise MailboxFound
-                        end
+                        extend mod
+                        raise MailboxFound
                     end
                 end
 
@@ -56,18 +54,16 @@ module Gurgitate
                     # Careful we don't get the wrong instance variable 
                     folderstyle=@folderstyle 
 
-                    self.class.instance_eval do
-                        include folderstyle
-                    end
+                    extend folderstyle
                 else
                     # No hints from the user either.  Let's guess!
                     # I'll use the same heuristic that Postfix uses--if the
                     # mailbox name ends with a /, then make it a Maildir,
                     # otherwise make it a mail file
                     if mailbox =~ /\/$/ then
-                        include Maildir
+                        extend Maildir
                     else
-                        include MBox
+                        extend MBox
                     end
                 end
                 
@@ -81,7 +77,8 @@ module Gurgitate
                 deliver_message(mailbox)
             rescue SystemCallError
                 self.log "Gack!  Something went wrong: "+$!
-                exit 75
+                raise
+                # exit 75
             end
         end
     end
