@@ -2,34 +2,71 @@ require 'test/unit'
 require 'test/unit/ui/console/testrunner'
 require 'stringio'
 require 'fileutils'
+require 'irb'
 require "./gurgitate-mail"
 
 class TC_Process < Test::Unit::TestCase
 
 	def setup
         @testdir = File.join(File.dirname(__FILE__),"..","test-data")
-        FileUtils.rm_rf @testdir if File.exists? @testdir
+        @folders = File.join(@testdir,"folders")
+        FileUtils.rmtree @testdir if File.exists? @testdir
         Dir.mkdir @testdir
+        Dir.mkdir @folders
 		m = StringIO.new("From: me\nTo: you\nSubject: test\n\nHi.")
+        @gurgitate = nil
 		@gurgitate = Gurgitate::Gurgitate.new(m)
         testdir = @testdir
+        folders = @folders
         @gurgitate.instance_eval do 
             sendmail "/bin/cat" 
             spooldir testdir
             spoolfile File.join(testdir, "default")
+            maildir folders
         end
         @spoolfile = File.join(testdir, "default")
 	end
 
     def teardown
-        FileUtils.rm_rf @testdir
+        FileUtils.rmtree @testdir
     end
-	
+
     def test_basic_delivery
         assert_nothing_raised do
-            @gurgitate.process { return }
+            @gurgitate.process { nil }
         end
         assert File.exists?(@spoolfile)
+    end
+
+    def test_detect_mbox
+        Dir.mkdir(@testdir) rescue nil
+        File.open(@spoolfile, File::WRONLY | File::CREAT) do |f|
+            f.print ""
+        end
+
+        assert_nothing_raised do
+            @gurgitate.process { nil }
+        end
+
+        assert File.exists?(@spoolfile)
+    end
+
+    def test_detect_maildir
+        FileUtils.mkdir @spoolfile
+        %w/cur tmp new/.each do |subdir|
+            FileUtils.mkdir File.join(@spoolfile, subdir)
+        end
+
+        assert_nothing_raised do
+            @gurgitate.process { nil }
+        end
+
+        assert Dir[File.join(@spoolfile,"new","*")].length > 0
+        assert File.exists?(Dir[File.join(@spoolfile,"new","*")][0])
+        FileUtils.rmtree @spoolfile
+        teardown
+        test_detect_mbox
+        setup
     end
 
     def test_pipe_raises_no_exceptions
