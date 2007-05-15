@@ -49,7 +49,7 @@ module Gurgitate
                 # let's default to whatever's in @folderstyle.  (I
                 # guess we'll be making a new mailbox, eh?)
 
-                if defined? @folderstyle then
+                if Module === @folderstyle then
                     #
                     # Careful we don't get the wrong instance variable 
                     folderstyle=@folderstyle 
