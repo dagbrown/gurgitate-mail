@@ -65,6 +65,9 @@ module Gurgitate
         # regex::
         #   The regular expression to match against the header's contents
         def matches (regex)
+            if String === regex
+                regex = Regexp.new(Regexp.escape(regex))
+            end
             @contents =~ regex
         end
 
@@ -120,7 +123,7 @@ module Gurgitate
         # have to deal with that by hand.  First, check to see if
         # there's a "From " line present in the first place.
         def figure_out_from_line(headertext)
-            (unix_from,normal_headers)  = headertext.split(/\n/,2);
+            (unix_from,normal_headers)  = headertext.split(/\n/,2)
 
             if unix_from =~ /^From /  then
                 headertext=normal_headers
@@ -141,7 +144,7 @@ module Gurgitate
                     @lastheader << h
                 else
                     header=Header.new(h)
-                    @headers[header.name] ||= HeaderBag.new;
+                    @headers[header.name] ||= HeaderBag.new
                     @headers[header.name].push(header)
                     @lastheader=header
                 end
@@ -177,22 +180,22 @@ module Gurgitate
             if @unix_from then
                 # If it is there, then grab the email address in it and
                 # use that as our official "from".
-                fromregex=/^From ([^ ]+@[^ ]+) /;
-                fromregex.match(@unix_from);
+                fromregex=/^From ([^ ]+@[^ ]+) /
+                fromregex.match(@unix_from)
                 @from=$+
 
                 # or maybe it's local
                 if @from == nil then
-                    @unix_from =~ /^From (\S+) /;
+                    @unix_from =~ /^From (\S+) /
                     @from=$+
                 end
             else
-                fromregex=/([^ ]+@[^ ]+) \(.*\)|[^<]*[<](.*@.*)[>]|([^ ]+@[^ ]+)/;
+                fromregex=/([^ ]+@[^ ]+) \(.*\)|[^<]*[<](.*@.*)[>]|([^ ]+@[^ ]+)/
                 if self["Return-Path"] != nil then
-                    fromregex.match(self["Return-Path"][0].contents);
+                    fromregex.match(self["Return-Path"][0].contents)
                 else
                     if self["From"] != nil then
-                        fromregex.match(self["From"][0].contents);
+                        fromregex.match(self["From"][0].contents)
                     end
                 end
                 address_candidate=$+
@@ -212,7 +215,7 @@ module Gurgitate
 
                 @from=address_candidate
 
-                @unix_from="From "+self.from+" "+Time.new.to_s;
+                @unix_from="From "+self.from+" "+Time.new.to_s
             end
         end
 
@@ -233,7 +236,7 @@ module Gurgitate
                     headername = key.to_s.gsub("_","-")
 
                     header=Header.new(headername, headertext[key])
-                    @headers[header.name] ||= HeaderBag.new;
+                    @headers[header.name] ||= HeaderBag.new
                     @headers[header.name].push(header)
                 end
             else
@@ -243,7 +246,7 @@ module Gurgitate
 
                     if sender # then don't believe the mbox separator
                         @from = sender
-                        @unix_from="From "+self.from+" "+Time.new.to_s;
+                        @unix_from="From "+self.from+" "+Time.new.to_s
                     else
                         guess_sender
                     end
@@ -290,7 +293,7 @@ module Gurgitate
         # newfrom:: An email address
         def from=(newfrom) 
             @from=newfrom
-            @unix_from="From "+self.from+" "+Time.new.to_s;
+            @unix_from="From "+self.from+" "+Time.new.to_s
         end
 
         # Match header +name+ against +regex+
@@ -313,9 +316,11 @@ module Gurgitate
         # regex:: The regex to match the headers against.
         def matches(names,regex)
             ret=false
+
             if names.class == "String" then
-                names=[names];
+                names=[names]
             end
+
             names.each do |n|
                 ret |= match(n,regex)
             end
