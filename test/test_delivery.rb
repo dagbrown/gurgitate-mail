@@ -166,12 +166,12 @@ class TC_Delivery < Test::Unit::TestCase
     def test_save_bad_filename
         assert_nothing_raised do
             @gurgitate.process do
-                save "test"
+                save "testing"
             end
         end
 
         assert File.exists?(@spoolfile)
-        assert !File.exists?("test")
+        assert !File.exists?("testing")
     end
 
     def test_cannot_save
