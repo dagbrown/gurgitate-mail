@@ -177,6 +177,62 @@ class TC_Process < Test::Unit::TestCase
         assert_equal 1, Dir[File.join(@spoolfile, ".test", "new", "*")].length
     end
 
+    def test_save_bad_filename
+        assert_nothing_raised do
+            @gurgitate.process do
+                save "test"
+            end
+        end
+
+        assert File.exists? @spoolfile
+        assert !File.exists?("test")
+    end
+
+    def test_cannot_save
+        FileUtils.touch @spoolfile
+        FileUtils.chmod 0, @spoolfile
+
+        assert_raises Errno::EACCES do
+            @gurgitate.process do 
+                nil
+            end
+        end
+    end
+
+    def test_mailbox_heuristics_mbox
+        @gurgitate.instance_eval do
+            @folderstyle = nil
+        end
+
+        assert_nothing_raised do
+            @gurgitate.process do
+                save "=test"
+            end
+        end
+
+        assert File.exists?(File.join(@folders, "test"))
+        assert File.stat(File.join(@folders, "test")).file?
+    end
+
+    def test_mailbox_heuristics_maildir
+        @gurgitate.instance_eval do
+            @folderstyle = nil
+        end
+
+        assert_nothing_raised do
+            @gurgitate.process do
+                save "=test/"
+            end
+        end
+
+        assert File.exists?(File.join(@folders, "test"))
+        assert File.stat(File.join(@folders, "test")).directory?
+        assert File.exists?(File.join(@folders, "test", "new"))
+        assert File.stat(File.join(@folders, "test","new")).directory?
+        assert_equal 0, Dir[File.join(@folders, "test", "cur", "*")].length
+        assert_equal 1, Dir[File.join(@folders, "test", "new", "*")].length
+    end
+
     def test_message_parsed_correctly
         assert_equal("From: me",@gurgitate.header("From"))
         assert_equal("To: you", @gurgitate.header("To"))
