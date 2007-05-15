@@ -36,7 +36,7 @@ module Gurgitate
         # syntax will continue to work.
         def self.attr_configparam(*syms)
             syms.each do |sym|
-                class_eval %/
+                class_eval %{
                     def #{sym} (*vals)
                         if vals.length == 1
                             @#{sym} = vals[0]
@@ -53,7 +53,7 @@ module Gurgitate
                     # old-style accessors though.  Breaking people's
                     # .gurgitate-rules is a bad idea.
                     attr_writer :#{sym}
-                /
+                }
             end
         end
 
@@ -233,7 +233,7 @@ module Gurgitate
                         filter.close_read
                         filter.print(self.to_s)
                         filter.close
-                        exit!
+                        exit
                     end
                 end
             end
@@ -256,7 +256,12 @@ module Gurgitate
                         log "Error while executing #{configfilespec}: #{$!}"
                         $@.each { |tr| log "Backtrace: #{tr}" }
                         folderstyle = MBox
-                        save(spoolfile)
+                        begin 
+                            save(spoolfile)
+                        rescue
+                            log "Last-ditch save to spoolfile failed"
+                            exit 75
+                        end
                     end
                 end
                 if block
