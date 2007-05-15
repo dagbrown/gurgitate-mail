@@ -316,7 +316,7 @@ module Gurgitate
         def matches(names,regex)
             ret=false
 
-            if names.class == "String" then
+            if names.class == String then
                 names=[names]
             end
 
