@@ -306,7 +306,7 @@ EOF
         assert_equal("Re: [nifty] Ping...",h["Subject"][0].contents)
     end
 
-    def another_crashy_test
+    def test_another_crashy_set_of_headers
         h=Gurgitate::Headers.new(<<'EOF'
 From HEYITBLEWUP Fri Nov 21 14:41:08 PST 2003
 Received: from unknown (harley.radius [192.168.0.123]) by yoda.radius with SMTP (Microsoft Exchange Internet Mail Service Version 5.5.2653.13)
@@ -315,9 +315,8 @@ Subject: IAP password
 EOF
         )
         assert_equal(h.from,"HEYITBLEWUP")
-        assert_equal(1,h["From"].length)
-        assert_equal("From",h["From"][0].name)
-        assert_equal("IAP password",h["Subject"][0].name)
+        assert_equal(nil,h["From"])
+        assert_equal("IAP password",h["Subject"][0].contents)
     end
 
     def test_fromline_no_hostname # illegal from line
