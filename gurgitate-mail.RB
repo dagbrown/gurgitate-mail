@@ -233,7 +233,7 @@ module Gurgitate
                         filter.close_read
                         filter.print(self.to_s)
                         filter.close
-                        exit
+                        exit!
                     end
                 end
             end
