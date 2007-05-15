@@ -114,7 +114,7 @@ task :doc => "gurgitate-mail.rb" do |task|
 end
 
 task :test => :default do
-    require './test'
+    require './test/runtests'
 
     testcases = Dir[File.join("tests","test_*")].map do |file|
         load file
