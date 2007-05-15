@@ -37,6 +37,53 @@ EOF
         assert_equal("fromheader@example.com",h["From"][0].contents)
     end
 
+    def test_changing_headers
+        h = Gurgitate::Headers.new(<<'EOF', "sender@example.com", "recipient@example.com")
+From: fromheader@example.com
+To: toheader@example.com
+Subject: Subject
+EOF
+        assert_equal(1,h["From"].length)
+        assert_equal("From", h["From"][0].name)
+        assert_equal("fromheader@example.com",h["From"][0].contents)
+
+        h["From"].sub! "fromheader", "changedheader"
+
+        assert_equal("changedheader@example.com",h["From"][0].contents)
+    end
+
+    def test_altered_headers
+        h = Gurgitate::Headers.new(<<'EOF', "sender@example.com", "recipient@example.com")
+From: fromheader@example.com
+To: toheader@example.com
+Subject: Subject
+EOF
+        assert_equal(1,h["From"].length)
+        assert_equal("From", h["From"][0].name)
+        assert_equal("fromheader@example.com",h["From"][0].contents)
+
+        new_header = h["From"].sub "fromheader", "changedheader"
+
+        assert Gurgitate::HeaderBag === new_header
+        assert_equal("changedheader@example.com",
+                     new_header[0].contents)
+        assert_equal("fromheader@example.com",h["From"][0].contents)
+    end
+
+    def test_matches
+        h = Gurgitate::Headers.new(<<'EOF', "sender@example.com", "recipient@example.com")
+From: fromheader@example.com
+To: toheader@example.com
+Subject: Subject
+EOF
+        assert h.matches(["From", "To"], /example.com/)
+        assert !h.matches(["From", "To"], /example.net/)
+
+        assert h.matches("From", /example.com/)
+        assert !h.matches("From", /example.net/)
+    end
+
+
     def test_fromline_no_username
         h=Gurgitate::Headers.new(<<'EOF'
 From  Sat Sep 27 12:20:25 PDT 2003
@@ -397,17 +444,36 @@ EOF
     end
 
     def test_match
-        assert @headers.match "From", /example.com/
+        assert @headers.match("From", /example.com/)
     end
 
     def test_nomatch
         assert !@headers.match("From", /lart.ca/)
     end
 
-    def test_match_string
+    def test_match_regex
+        result = nil
         assert_nothing_raised do
-            @headers.match "From", "example.com"
+            result = @headers.match "From", /example.com/
         end
+        assert result
+    end
+
+    def test_match_string
+        result = nil
+
+        assert_nothing_raised do
+            assert result = @headers.match("From", "example.com")
+        end
+
+        assert result
+        result = nil
+
+        assert_nothing_raised do
+            result = @headers.match("From", "e.ample.com")
+        end
+
+        assert !result
     end
 end
 
