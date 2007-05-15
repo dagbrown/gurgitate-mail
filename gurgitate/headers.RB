@@ -92,7 +92,6 @@ module Gurgitate
             each do |header|
                 header.contents = header.contents.sub regex, replacement
             end
-            p self
         end
         
         def sub(regex, replacement)
