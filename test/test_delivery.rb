@@ -5,42 +5,9 @@ require 'fileutils'
 require 'pathname'
 require 'irb'
 require "./gurgitate-mail"
+require "test/gurgitate-test"
 
-class TC_Delivery < Test::Unit::TestCase
-
-	def setup
-        currentdir = Pathname.new(File.join(File.dirname(__FILE__), 
-                                         "..")).realpath.to_s
-        @testdir = File.join(currentdir,"test-data")
-        @folders = File.join(@testdir,"folders")
-        FileUtils.rmtree @testdir if File.exists? @testdir
-        Dir.mkdir @testdir
-        Dir.mkdir @folders
-		m = StringIO.new("From: me\nTo: you\nSubject: test\n\nHi.\n")
-        @gurgitate = nil
-		@gurgitate = Gurgitate::Gurgitate.new(m)
-        testdir = @testdir
-        folders = @folders
-        @gurgitate.instance_eval do 
-            sendmail "/bin/cat" 
-            spooldir testdir
-            spoolfile File.join(testdir, "default")
-            maildir folders
-        end
-        @spoolfile = File.join(testdir, "default")
-	end
-
-    def maildirmake mailbox # per the command
-        FileUtils.mkdir mailbox
-        %w/cur tmp new/.each do |subdir|
-            FileUtils.mkdir File.join(mailbox, subdir)
-        end
-    end
-
-    def teardown
-        FileUtils.rmtree @testdir
-    end
-
+class TC_Delivery < GurgitateTest
     #************************************************************************
     # tests
     #************************************************************************

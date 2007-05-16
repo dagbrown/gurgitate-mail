@@ -6,41 +6,7 @@ require 'pathname'
 require 'irb'
 require "./gurgitate-mail"
 
-class TC_Process < Test::Unit::TestCase
-
-	def setup
-        currentdir = Pathname.new(File.join(File.dirname(__FILE__), 
-                                         "..")).realpath.to_s
-        @testdir = File.join(currentdir,"test-data")
-        @folders = File.join(@testdir,"folders")
-        FileUtils.rmtree @testdir if File.exists? @testdir
-        Dir.mkdir @testdir
-        Dir.mkdir @folders
-		m = StringIO.new("From: me\nTo: you\nSubject: test\n\nHi.\n")
-        @gurgitate = nil
-		@gurgitate = Gurgitate::Gurgitate.new(m)
-        testdir = @testdir
-        folders = @folders
-        @gurgitate.instance_eval do 
-            sendmail "/bin/cat" 
-            spooldir testdir
-            spoolfile File.join(testdir, "default")
-            maildir folders
-        end
-        @spoolfile = File.join(testdir, "default")
-	end
-
-    def maildirmake mailbox # per the command
-        FileUtils.mkdir mailbox
-        %w/cur tmp new/.each do |subdir|
-            FileUtils.mkdir File.join(mailbox, subdir)
-        end
-    end
-
-    def teardown
-        FileUtils.rmtree @testdir
-    end
-
+class TC_Process < GurgitateTest
     #************************************************************************
     # tests
     #************************************************************************ 
@@ -88,5 +54,11 @@ class TC_Process < Test::Unit::TestCase
         assert_equal("Hi.\n", mess.body, "Body is wrong")
         assert_equal("Subject: test", mess.header("Subject"), "Subject header wrong")
     end
-end
 
+    def test_method_missing
+        assert_equal "test", @gurgitate.subject[0].contents
+        assert_raises NameError do
+            p @gurgitate.nonexistentheader
+        end
+    end
+end
