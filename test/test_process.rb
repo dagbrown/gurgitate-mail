@@ -61,4 +61,17 @@ class TC_Process < GurgitateTest
             p @gurgitate.nonexistentheader
         end
     end
+
+    def test_filter
+        new_obj = nil
+        assert_nothing_raised do
+            new_obj = @gurgitate.filter("tr a-z A-Z")
+        end
+
+        assert_equal "HI.\n", new_obj.body
+        assert_equal "ME", new_obj.from
+        assert_equal "TEST", new_obj.subject[0].contents
+
+    end
+
 end
