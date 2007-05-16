@@ -175,7 +175,7 @@ module Gurgitate
         #   handled any other way.
         def method_missing(meth)
             headername=meth.to_s.split(/_/).map {|x| x.capitalize}.join("-")
-            if defined?(headers[headername]) then
+            if headers[headername] then
                 return headers[headername]
             else
                 raise NameError,"undefined local variable or method, or header not found `#{meth}' for #{self}:#{self.class}"
