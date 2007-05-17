@@ -124,6 +124,10 @@ task :test => :default do
     runtests testcases
 end
 
+task :cover => :default do
+    system("rcov test/runtests.rb")
+end
+
 task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 
     File.install(File.join("..",Tarball),Webpage,0644)
     File.install(File.join("..",Gemfile), Webpage, 0644)
