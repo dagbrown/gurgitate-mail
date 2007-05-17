@@ -7,6 +7,7 @@
 require 'test/unit'
 require 'test/unit/ui/console/testrunner'
 require 'stringio'
+require 'pathname'
 
 def runtests(testcases)
     testcases.each do |testcase|
@@ -14,7 +15,9 @@ def runtests(testcases)
     end
 end
 
-testcases = Dir[File.join("test","test_*")].map do |file|
+testpath = Pathname.new(__FILE__).dirname.realpath
+
+testcases = Dir[File.join(testpath,"test_*")].map do |file|
     load file
     eval("TC_" + File.basename(file,".rb").sub(/^test_/,'').capitalize)
 end
