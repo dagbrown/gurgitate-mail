@@ -84,5 +84,4 @@ class TC_Process < GurgitateTest
         assert_equal "TEST", new_obj.subject[0].contents
 
     end
-
 end
