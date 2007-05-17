@@ -211,9 +211,6 @@ module Gurgitate
                 f.print(self.to_s)
             end
             return $?>>8
-          rescue SystemCallError
-            save(spoolfile())
-            return -1
         end
 
         # Pipes the message through +program+, and returns another
@@ -237,34 +234,39 @@ module Gurgitate
                     end
                 end
             end
-          rescue SystemCallError
-            save(Spoolfile)
-            return nil
         end
 
         # Processes your .gurgitate-rules.rb.
         def process(&block)
-            if @rules.size > 0 or block
-                @rules.each do |configfilespec|
-                    begin
-                        eval File.new(configfilespec).read, nil,
-                            configfilespec
-                    rescue ScriptError
-                        log "Couldn't load #{configfilespec}: "+$!
-                        save(spoolfile)
-                    rescue Exception
-                        log "Error while executing #{configfilespec}: #{$!}"
-                        $@.each { |tr| log "Backtrace: #{tr}" }
-                        folderstyle = MBox
-                        save(spoolfile)
+            begin
+                if @rules.size > 0 or block
+                    @rules.each do |configfilespec|
+                        begin
+                            eval File.new(configfilespec).read, nil,
+                                configfilespec
+                        rescue ScriptError
+                            log "Couldn't load #{configfilespec}: "+$!
+                            save(spoolfile)
+                        rescue Exception
+                            log "Error while executing #{configfilespec}: #{$!}"
+                            $@.each { |tr| log "Backtrace: #{tr}" }
+                            folderstyle = MBox
+                            save(spoolfile)
+                        end
                     end
+                    if block
+                        instance_eval(&block)
+                    end
+                    log "Mail not covered by rules, saving to default spool"
+                    save(spoolfile)
+                else
+                    save(spoolfile)
                 end
-                if block
-                    instance_eval(&block)
-                end
-                log "Mail not covered by rules, saving to default spool"
-                save(spoolfile)
-            else
+            rescue Exception
+                log "Error while executing rules: #{$!}"
+                $@.each { |tr| log "Backtrace: #{tr}" }
+                log "Attempting to save to spoolfile after error"
+                folderstyle = MBox
                 save(spoolfile)
             end
         end
