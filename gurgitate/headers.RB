@@ -65,6 +65,9 @@ module Gurgitate
         # regex::
         #   The regular expression to match against the header's contents
         def matches (regex)
+            if String === regex
+                regex = Regexp.new(Regexp.escape(regex))
+            end
             @contents =~ regex
         end
 
@@ -89,7 +92,6 @@ module Gurgitate
             each do |header|
                 header.contents = header.contents.sub regex, replacement
             end
-            p self
         end
         
         def sub(regex, replacement)
@@ -120,7 +122,7 @@ module Gurgitate
         # have to deal with that by hand.  First, check to see if
         # there's a "From " line present in the first place.
         def figure_out_from_line(headertext)
-            (unix_from,normal_headers)  = headertext.split(/\n/,2);
+            (unix_from,normal_headers)  = headertext.split(/\n/,2)
 
             if unix_from =~ /^From /  then
                 headertext=normal_headers
@@ -141,7 +143,7 @@ module Gurgitate
                     @lastheader << h
                 else
                     header=Header.new(h)
-                    @headers[header.name] ||= HeaderBag.new;
+                    @headers[header.name] ||= HeaderBag.new
                     @headers[header.name].push(header)
                     @lastheader=header
                 end
@@ -168,25 +170,31 @@ module Gurgitate
             # used, then I _particularly_ hope that things never get so
             # bad that poor gurgitate has to use the From: header as a
             # source of authoritative information on anything.
+            #
+            # And then after all that fuss, if we're delivering to a
+            # Maildir, I have to get rid of it.  And sometimes the MTA
+            # gives me a mbox-style From line and sometimes it doesn't.
+            # It's annoying, but I have no choice but to Just Deal With
+            # It.
             if @unix_from then
                 # If it is there, then grab the email address in it and
                 # use that as our official "from".
-                fromregex=/^From ([^ ]+@[^ ]+) /;
-                fromregex.match(@unix_from);
+                fromregex=/^From ([^ ]+@[^ ]+) /
+                fromregex.match(@unix_from)
                 @from=$+
 
                 # or maybe it's local
                 if @from == nil then
-                    @unix_from =~ /^From (\S+) /;
+                    @unix_from =~ /^From (\S+) /
                     @from=$+
                 end
             else
-                fromregex=/([^ ]+@[^ ]+) \(.*\)|[^<]*[<](.*@.*)[>]|([^ ]+@[^ ]+)/;
+                fromregex=/([^ ]+@[^ ]+) \(.*\)|[^<]*[<](.*@.*)[>]|([^ ]+@[^ ]+)/
                 if self["Return-Path"] != nil then
-                    fromregex.match(self["Return-Path"][0].contents);
+                    fromregex.match(self["Return-Path"][0].contents)
                 else
                     if self["From"] != nil then
-                        fromregex.match(self["From"][0].contents);
+                        fromregex.match(self["From"][0].contents)
                     end
                 end
                 address_candidate=$+
@@ -206,7 +214,7 @@ module Gurgitate
 
                 @from=address_candidate
 
-                @unix_from="From "+self.from+" "+Time.new.to_s;
+                @unix_from="From "+self.from+" "+Time.new.to_s
             end
         end
 
@@ -216,6 +224,8 @@ module Gurgitate
         # headertext::
         #   The text of the message headers.
         def initialize(headertext=nil,sender=nil, recipient=nil)
+            @from    = sender
+            @to      = recipient
             @headers = Hash.new(nil)
 
             if Hash === headertext
@@ -225,7 +235,7 @@ module Gurgitate
                     headername = key.to_s.gsub("_","-")
 
                     header=Header.new(headername, headertext[key])
-                    @headers[header.name] ||= HeaderBag.new;
+                    @headers[header.name] ||= HeaderBag.new
                     @headers[header.name].push(header)
                 end
             else
@@ -233,9 +243,9 @@ module Gurgitate
                     @unix_from, @headertext = figure_out_from_line headertext
                     parse_headers if @headertext
 
-                    if sender
+                    if sender # then don't believe the mbox separator
                         @from = sender
-                        @unix_from="From "+self.from+" "+Time.new.to_s;
+                        @unix_from="From "+self.from+" "+Time.new.to_s
                     else
                         guess_sender
                     end
@@ -269,7 +279,7 @@ module Gurgitate
         #
         # Yet another bucket of rants.  Unix mail sucks.
         def to
-            return @headers["X-Original-To"] || nil
+            return @to || @headers["X-Original-To"] || nil
         end
 
         # Who the message is from (the envelope from)
@@ -282,7 +292,7 @@ module Gurgitate
         # newfrom:: An email address
         def from=(newfrom) 
             @from=newfrom
-            @unix_from="From "+self.from+" "+Time.new.to_s;
+            @unix_from="From "+self.from+" "+Time.new.to_s
         end
 
         # Match header +name+ against +regex+
@@ -305,9 +315,11 @@ module Gurgitate
         # regex:: The regex to match the headers against.
         def matches(names,regex)
             ret=false
-            if names.class == "String" then
-                names=[names];
+
+            if names.class == String then
+                names=[names]
             end
+
             names.each do |n|
                 ret |= match(n,regex)
             end

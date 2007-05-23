@@ -88,6 +88,6 @@ module Gurgitate
         def to_s; @headers.to_s + "\n\n" + ( @body || ""); end
 
         # Returns the mail message formatted for mbox
-        def to_mbox; @headers.to_mbox + @body; end
+        def to_mbox; @headers.to_mbox + "\n\n" + @body; end
     end
 end

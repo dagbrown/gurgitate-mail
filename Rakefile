@@ -37,9 +37,11 @@ Targets = %w{gurgitate-mail.rb
              gurgitate-mail.man
              README} + Modules
 
+Tests = Dir["test/*.rb"]
+
 Gemspec = "#{Package}.gemspec"
 
-Releasefiles = %w{CHANGELOG INSTALL install.rb} + Targets
+Releasefiles = %w{CHANGELOG INSTALL install.rb} + Targets + Tests
 
 Webpage=ENV["HOME"]+"/public_html/software/gurgitate-mail"
 Version=File.open("VERSION").read.chomp
@@ -114,7 +116,8 @@ task :doc => "gurgitate-mail.rb" do |task|
 end
 
 task :test => :default do
-    require './test'
+    $:.unshift(File.dirname(__FILE__))
+    require './test/runtests'
 
     testcases = Dir[File.join("tests","test_*")].map do |file|
         load file
@@ -122,6 +125,10 @@ task :test => :default do
     end
 
     runtests testcases
+end
+
+task :cover => :default do
+    system("rcov test/runtests.rb")
 end
 
 task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 

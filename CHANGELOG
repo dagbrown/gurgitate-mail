@@ -1,8 +1,14 @@
-1.9.x:
+1.8.5:
 
-- Added the ability to create new Gurgitate::Mailmessage objects with the
-  "create" constructor--instead of giving it the text of a message to
-  parse, you give it headers as a hash and it puts the mail message together.
+- Finally finished writing a much more comprehensive set of tests, and fixed
+  the bugs that testing turned up.  Yes, this is something that I
+  procrastinated doing for five years.
+- Added the tests to the distribution so that others can run them too.
+
+1.8.4:
+
+- Fixed Rubyforge bug #9524, "filter(program) throws exception"
+- Fixed Rubyforge bug #8668, "Should cleanly handle email with no FROM information"
 
 1.8.3:
 

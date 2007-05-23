@@ -45,4 +45,8 @@ else
   gurgitate.add_rules(GLOBAL_RULES_POST, :system => true)
 end
 
-gurgitate.process
+begin
+    gurgitate.process
+rescue 
+    exit 75
+end

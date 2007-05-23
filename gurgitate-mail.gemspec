@@ -29,5 +29,5 @@ spec = Gem::Specification.new do |s|
 
     # Documentation and testing.
     s.has_rdoc = true
-    s.test_suite_file = "test.rb"
+    s.test_files = Dir["test/*.rb"]
 end
