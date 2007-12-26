@@ -18,6 +18,7 @@
 #========================================================================
 
 require 'ftools'
+
 begin
     require "rake/classic_namespace"
 rescue nil
@@ -27,6 +28,7 @@ Package = "gurgitate-mail"
 
 Modules =  %w{gurgitate/deliver.rb
              gurgitate/headers.rb 
+             gurgitate/header.rb 
              gurgitate/mailmessage.rb
              gurgitate/deliver/maildir.rb
              gurgitate/deliver/mbox.rb}
@@ -37,9 +39,13 @@ Targets = %w{gurgitate-mail.rb
              gurgitate-mail.man
              README} + Modules
 
+Support = %w{ftools.rb}
+
+Tests = Dir["test/*.rb"]
+
 Gemspec = "#{Package}.gemspec"
 
-Releasefiles = %w{CHANGELOG INSTALL install.rb} + Targets
+Releasefiles = %w{CHANGELOG INSTALL install.rb} + Targets + Tests + Support
 
 Webpage=ENV["HOME"]+"/public_html/software/gurgitate-mail"
 Version=File.open("VERSION").read.chomp
@@ -114,8 +120,18 @@ task :doc => "gurgitate-mail.rb" do |task|
 end
 
 task :test => :default do
-    require './test'
-    runtests
+    require './test/runtests'
+
+    testcases = Dir[File.join("tests","test_*")].map do |file|
+        load file
+        eval("TC_" + File.basename(file,".rb").sub(/^test_/,'').capitalize)
+    end
+
+    runtests testcases
+end
+
+task :cover => :default do
+    system("rcov test/runtests.rb")
 end
 
 task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 

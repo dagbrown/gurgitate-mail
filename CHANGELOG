@@ -1,3 +1,15 @@
+1.9.1:
+
+- Made a bunch of little changes to ensure that gurgitate-mail is compatible
+  with Ruby 1.9.0 (whilst not sacrificing compatibility with Ruby 1.8.x)
+- Added the unit tests to the tarball for those who are curious
+
+1.9.0:
+
+- Added the ability to create new Gurgitate::Mailmessage objects with the
+  "create" constructor--instead of giving it the text of a message to
+  parse, you give it headers as a hash and it puts the mail message together.
+
 1.8.3:
 
 - Added an "exit 75 (TEMPFAIL)" for when it tries its best to deliver a mail

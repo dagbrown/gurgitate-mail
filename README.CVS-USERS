@@ -15,4 +15,6 @@ If you don't have rake installed then grab a copy of it at:
 
     http://jimweirich.umlcoop.net/packages/rake/
 
+or say "gem install rake".
+
 --Dave

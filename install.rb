@@ -38,7 +38,7 @@ module Gurgitate
                 sitedir = CONFIG["sitedir"]
                 bindir  = CONFIG["bindir"]
                 mandir  = File.join(CONFIG["mandir"],"man1")
-                dest    = File.join(sitedir,version)
+                dest    = CONFIG["sitelibdir"]
             end
 
             destgur = File.join(dest,"gurgitate")
