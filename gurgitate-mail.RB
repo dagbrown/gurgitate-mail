@@ -36,7 +36,7 @@ module Gurgitate
         # syntax will continue to work.
         def self.attr_configparam(*syms)
             syms.each do |sym|
-                class_eval %{
+                class_eval %/
                     def #{sym} (*vals)
                         if vals.length == 1
                             @#{sym} = vals[0]
@@ -53,7 +53,7 @@ module Gurgitate
                     # old-style accessors though.  Breaking people's
                     # .gurgitate-rules is a bad idea.
                     attr_writer :#{sym}
-                }
+                /
             end
         end
 
@@ -126,7 +126,7 @@ module Gurgitate
             @rules       = []
 
             input_text = ""
-            input.each do |l| input_text << l end
+            input.each_line do |l| input_text << l end
             super(input_text, recipient, sender)
             instance_eval(&block) if block_given?
         end
@@ -175,7 +175,7 @@ module Gurgitate
         #   handled any other way.
         def method_missing(meth)
             headername=meth.to_s.split(/_/).map {|x| x.capitalize}.join("-")
-            if defined?(headers[headername]) then
+            if headers[headername] then
                 return headers[headername]
             else
                 raise NameError,"undefined local variable or method, or header not found `#{meth}' for #{self}:#{self.class}"
@@ -211,9 +211,6 @@ module Gurgitate
                 f.print(self.to_s)
             end
             return $?>>8
-          rescue SystemCallError
-            save(spoolfile())
-            return -1
         end
 
         # Pipes the message through +program+, and returns another
@@ -221,8 +218,12 @@ module Gurgitate
         def filter(program,&block)
             self.log "Filtering with "+program
             IO.popen("-","w+") do |filter|
-                if filter.nil? then
-                    exec(program)
+                unless filter then
+                    begin
+                        exec(program)
+                    rescue
+                        exit! # should not get here anyway
+                    end
                 else
                     if fork
                         filter.close_write
@@ -230,41 +231,51 @@ module Gurgitate
                         g.instance_eval(&block) if block_given?
                         return g
                     else
-                        filter.close_read
-                        filter.print(self.to_s)
-                        filter.close
-                        exit
+                        begin
+                            filter.close_read
+                            filter.print to_s
+                            filter.close
+                        rescue
+                            nil
+                        ensure
+                            exit!
+                        end
                     end
                 end
             end
-          rescue SystemCallError
-            save(Spoolfile)
-            return nil
         end
 
         # Processes your .gurgitate-rules.rb.
         def process(&block)
-            if @rules.size > 0 or block
-                @rules.each do |configfilespec|
-                    begin
-                        eval File.new(configfilespec).read, nil,
-                            configfilespec
-                    rescue ScriptError
-                        log "Couldn't load #{configfilespec}: "+$!
-                        save(spoolfile)
-                    rescue Exception
-                        log "Error while executing #{configfilespec}: #{$!}"
-                        $@.each { |tr| log "Backtrace: #{tr}" }
-                        folderstyle = MBox
-                        save(spoolfile)
+            begin
+                if @rules.size > 0 or block
+                    @rules.each do |configfilespec|
+                        begin
+                            eval File.new(configfilespec).read, nil,
+                                configfilespec
+                        rescue ScriptError
+                            log "Couldn't load #{configfilespec}: "+$!
+                            save(spoolfile)
+                        rescue Exception
+                            log "Error while executing #{configfilespec}: #{$!}"
+                            $@.each { |tr| log "Backtrace: #{tr}" }
+                            folderstyle = MBox
+                            save(spoolfile)
+                        end
                     end
+                    if block
+                        instance_eval(&block)
+                    end
+                    log "Mail not covered by rules, saving to default spool"
+                    save(spoolfile)
+                else
+                    save(spoolfile)
                 end
-                if block
-                    instance_eval(&block)
-                end
-                log "Mail not covered by rules, saving to default spool"
-                save(spoolfile)
-            else
+            rescue Exception
+                log "Error while executing rules: #{$!}"
+                $@.each { |tr| log "Backtrace: #{tr}" }
+                log "Attempting to save to spoolfile after error"
+                folderstyle = MBox
                 save(spoolfile)
             end
         end
