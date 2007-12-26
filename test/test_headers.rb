@@ -8,9 +8,14 @@ require 'test/unit'
 require 'test/unit/ui/console/testrunner'
 require 'stringio'
 
+builddir = File.join(File.dirname(__FILE__),"..")
+unless $:[0] == builddir
+    $:.unshift builddir
+end
+
 class TC_Headers < Test::Unit::TestCase
     def setup
-        require './gurgitate-mail'
+        require 'gurgitate-mail'
     end
 
     def test_single_header
