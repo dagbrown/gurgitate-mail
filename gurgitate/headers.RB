@@ -63,7 +63,7 @@ module Gurgitate
         end
 
         def parse_headers
-            @headertext.each do |h|
+            @headertext.each_line do |h|
                 h.chomp!
                 if(h=~/^\s+/) then
                     @lastheader << h
