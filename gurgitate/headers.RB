@@ -31,6 +31,12 @@ module Gurgitate
             )
         end
 
+        def to_s
+            map do |member|
+                member.to_s
+            end.join ""
+        end
+
     end
 
     # A slightly bigger class for all of a message's headers
