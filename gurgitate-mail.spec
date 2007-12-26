@@ -1,8 +1,8 @@
-# $Revision: 1.1 $, $Date: 2007/12/26 07:55:11 $
+# $Revision: 1.2 $, $Date: 2007/12/26 07:55:56 $
 Summary:	gurgitate mail filtering and mail delivery agent
 Summary(pl.UTF-8):	gurgitate - narzędzie do filtrowania i dostarczania poczty
 Name:		gurgitate-mail
-Version:	1.8.4
+Version:	1.9.0
 Release:	1
 License:	GPL
 Group:		Development/Languages
@@ -54,6 +54,9 @@ rm -rf $RPM_BUILD_ROOT
 All persons listed below can be reached at <cvs_login>@pld-linux.org
 
 $Log: gurgitate-mail.spec,v $
+Revision 1.2  2007/12/26 07:55:56  aredridel
+- change version
+
 Revision 1.1  2007/12/26 07:55:11  aredridel
 - added spec, from PLD sources
 
