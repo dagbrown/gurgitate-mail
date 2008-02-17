@@ -87,10 +87,20 @@ module Gurgitate
                     spooldir homedir
                     spoolfile File.join(spooldir,"Maildir")
                     maildir spoolfile
+                elsif style[0] == MH then
+                    mh_profile_path = File.join(ENV["HOME"],".mh_profile")
+                    if File.exists?(mh_profile_path) then
+                        mh_profile = YAML.load(File.read(mh_profile_path))
+                        maildir mh_profile["Path"]
+                    else
+                        maildir File.join(ENV["HOME"],"Mail")
+                    end
+                    spoolfile File.join(maildir,"inbox")
                 else
                     spooldir "/var/spool/mail"
                     spoolfile File.join(spooldir, @passwd.name)
                 end
+
                 @folderstyle = style[0]
             else
                 raise ArgumentError, "wrong number of arguments "+

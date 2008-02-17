@@ -7,6 +7,7 @@
 
 require "gurgitate/deliver/mbox"
 require "gurgitate/deliver/maildir"
+require "gurgitate/deliver/mh"
 
 module Gurgitate
     module Deliver
@@ -38,7 +39,7 @@ module Gurgitate
             end
 
             begin
-                [MBox,Maildir].each do |mod|
+                [MBox,Maildir,MH].each do |mod|
                     if mod::check_mailbox(mailbox) then
                         extend mod
                         raise MailboxFound

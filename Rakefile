@@ -17,7 +17,7 @@
 #       http://jimweirich.umlcoop.net/packages/rake/
 #========================================================================
 
-require 'ftools'
+require 'fileutils'
 
 begin
     require "rake/classic_namespace"
@@ -31,7 +31,8 @@ Modules =  %w{gurgitate/deliver.rb
              gurgitate/header.rb 
              gurgitate/mailmessage.rb
              gurgitate/deliver/maildir.rb
-             gurgitate/deliver/mbox.rb}
+             gurgitate/deliver/mbox.rb
+             gurgitate/deliver/mh.rb}
 
 Targets = %w{gurgitate-mail.rb
              gurgitate-mail
@@ -39,13 +40,11 @@ Targets = %w{gurgitate-mail.rb
              gurgitate-mail.man
              README} + Modules
 
-Support = %w{ftools.rb}
-
 Tests = Dir["test/*.rb"]
 
 Gemspec = "#{Package}.gemspec"
 
-Releasefiles = %w{CHANGELOG INSTALL install.rb} + Targets + Tests + Support
+Releasefiles = %w{CHANGELOG INSTALL install.rb} + Targets + Tests
 
 Webpage=ENV["HOME"]+"/public_html/software/gurgitate-mail"
 Version=File.open("VERSION").read.chomp
@@ -146,7 +145,7 @@ def ruby_compile(task)
     task.prerequisites.each do |p|
         run("ruby -w -c #{p}")
     end
-    File.copy(task.prerequisites[0], task.name, true)
+    FileUtils.cp(task.prerequisites[0], task.name)
 end    
 
 file("gurgitate-mail.rb" => ["gurgitate-mail.RB"]) { |t| ruby_compile(t) }
@@ -158,7 +157,7 @@ end
 file "README" => "gurgitate-mail.text" do |t|
     t.sources=[t.prerequisites[0]]
     Task[t.source].invoke
-    File.copy(t.source, t.name, true)
+    FileUtils.cp(t.source, t.name)
 end
 
 %w{html text}.each do |s|

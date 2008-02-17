@@ -4,12 +4,7 @@ require 'stringio'
 require 'fileutils'
 require 'pathname'
 require 'irb'
-
-builddir = File.join(File.dirname(__FILE__),"..")
-unless $:[0] == builddir
-    $:.unshift builddir
-end
-
+$:.unshift File.dirname(__FILE__) + "/.."
 require "gurgitate-mail"
 
 class GurgitateTest < Test::Unit::TestCase
@@ -36,11 +31,15 @@ class GurgitateTest < Test::Unit::TestCase
         @spoolfile = File.join(testdir, "default")
 	end
 
-    def maildirmake mailbox # per the command
+    def maildirmake mailbox # per the UNIX command
         FileUtils.mkdir mailbox
         %w/cur tmp new/.each do |subdir|
             FileUtils.mkdir File.join(mailbox, subdir)
         end
+    end
+
+    def mhdirmake mailbox # per "maildirmake"
+        FileUtils.mkdir mailbox
     end
 
     def teardown
