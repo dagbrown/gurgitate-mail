@@ -8,6 +8,40 @@ require "test/gurgitate-test"
 require "gurgitate-mail"
 
 class TC_Gurgitate_delivery < GurgitateTest
+    def ensure_empty_maildir(dir)
+        assert File.exists?(dir)
+        assert File.stat(dir).directory?
+        assert File.exists?(File.join(dir, "new"))
+
+        assert_equal 0, Dir[File.join(dir, "new", "*")].length
+        assert_equal 0, Dir[File.join(dir, "cur", "*")].length
+    end
+
+    def ensure_maildir_with_n_messages(dir, n)
+        assert File.exists?(dir)
+        assert File.stat(dir).directory?
+        assert File.exists?(File.join(dir, "new"))
+        assert File.stat(File.join(dir, "new")).directory?
+        assert_equal 0, Dir[File.join(dir, "cur", "*")].length
+        assert_equal n, Dir[File.join(dir, "new", "*")].length
+    end
+
+    def ensure_empty_mhdir(dir)
+        assert File.exists?(dir)
+        assert File.stat(dir).directory?
+
+        assert_equal 0, Dir[File.join(dir, "*")].length
+    end
+
+    def ensure_mhdir_with_messages(dir, *messages)
+        assert File.exists?(dir)
+        assert File.stat(dir).directory?
+        messages.each do |message|
+            assert File.exists?(File.join(dir, message.to_s))
+            assert File.stat(File.join(dir,message.to_s)).file?
+        end
+    end
+
     #************************************************************************
     # tests
     #************************************************************************
@@ -78,12 +112,7 @@ class TC_Gurgitate_delivery < GurgitateTest
     def test_save_guess_maildir
         maildirmake File.join(@folders,"test")
 
-        assert File.exists?(File.join(@folders, "test"))
-        assert File.stat(File.join(@folders, "test")).directory?
-        assert File.exists?(File.join(@folders, "test", "new"))
-
-        assert_equal 0, Dir[File.join(@folders, "test", "new", "*")].length
-        assert_equal 0, Dir[File.join(@folders, "test", "cur", "*")].length
+        ensure_empty_maildir File.join(@folders, "test")
 
         assert_nothing_raised do
             @gurgitate.process do
@@ -92,21 +121,13 @@ class TC_Gurgitate_delivery < GurgitateTest
             end
         end
 
-        assert File.exists?(File.join(@folders, "test"))
-        assert File.stat(File.join(@folders, "test")).directory?
-        assert File.exists?(File.join(@folders, "test", "new"))
-        assert File.stat(File.join(@folders, "test","new")).directory?
-        assert_equal 0, Dir[File.join(@folders, "test", "cur", "*")].length
-        assert_equal 1, Dir[File.join(@folders, "test", "new", "*")].length
+        ensure_maildir_with_n_messages(File.join(@folders, "test"), 1)
     end
 
     def test_save_guess_mh
         mhdirmake File.join(@folders,"test")
 
-        assert File.exists?(File.join(@folders, "test"))
-        assert File.stat(File.join(@folders, "test")).directory?
-
-        assert_equal 0, Dir[File.join(@folders, "test", "*")].length
+        ensure_empty_mhdir File.join(@folders, "test")
 
         assert_nothing_raised do
             @gurgitate.process do
@@ -115,10 +136,7 @@ class TC_Gurgitate_delivery < GurgitateTest
             end
         end
 
-        assert File.exists?(File.join(@folders, "test"))
-        assert File.stat(File.join(@folders, "test")).directory?
-        assert File.exists?(File.join(@folders, "test", "1"))
-        assert File.stat(File.join(@folders, "test","1")).file?
+        ensure_mhdir_with_messages(File.join(@folders,"test"),1)
         assert File.exists?(File.join(@folders, "test", ".mh_sequences"))
         assert File.stat(File.join(@folders, "test", ".mh_sequences")).file?
         assert_equal "unseen: 1\n", 
@@ -128,12 +146,7 @@ class TC_Gurgitate_delivery < GurgitateTest
     def test_save_maildir_collision
         maildirmake File.join(@folders,"test")
 
-        assert File.exists?(File.join(@folders, "test"))
-        assert File.stat(File.join(@folders, "test")).directory?
-        assert File.exists?(File.join(@folders, "test", "new"))
-
-        assert_equal 0, Dir[File.join(@folders, "test", "new", "*")].length
-        assert_equal 0, Dir[File.join(@folders, "test", "cur", "*")].length
+        ensure_empty_maildir(File.join(@folders, "test"))
 
         assert_nothing_raised do
             @gurgitate.process do
@@ -143,20 +156,13 @@ class TC_Gurgitate_delivery < GurgitateTest
             end
         end
 
-        assert File.exists?(File.join(@folders, "test"))
-        assert File.stat(File.join(@folders, "test")).directory?
-        assert File.exists?(File.join(@folders, "test", "new"))
-        assert File.stat(File.join(@folders, "test","new")).directory?
-        assert_equal 0, Dir[File.join(@folders, "test", "cur", "*")].length
-        assert_equal 2, Dir[File.join(@folders, "test", "new", "*")].length
+        ensure_maildir_with_n_messages(File.join(@folders,"test"),2)
     end
 
     def test_save_mh_collision
         mhdirmake File.join(@folders,"test")
 
-        assert File.exists?(File.join(@folders, "test"))
-        assert File.stat(File.join(@folders, "test")).directory?
-        assert_equal 0, Dir[File.join(@folders, "test", "*")].length
+        ensure_empty_mhdir File.join(@folders,"test")
 
         assert_nothing_raised do
             @gurgitate.process do
@@ -166,12 +172,8 @@ class TC_Gurgitate_delivery < GurgitateTest
             end
         end
 
-        assert File.exists?(File.join(@folders, "test"))
-        assert File.stat(File.join(@folders, "test")).directory?
-        assert File.exists?(File.join(@folders, "test", "1"))
-        assert File.stat(File.join(@folders, "test","1")).file?
-        assert File.exists?(File.join(@folders, "test", "2"))
-        assert File.stat(File.join(@folders, "test","2")).file?
+        ensure_mhdir_with_messages(File.join(@folders, "test"), 1, 2)
+
         assert File.exists?(File.join(@folders, "test", ".mh_sequences"))
         assert File.stat(File.join(@folders, "test", ".mh_sequences")).file?
         assert_equal "unseen: 1-2\n", 
@@ -190,12 +192,7 @@ class TC_Gurgitate_delivery < GurgitateTest
             end
         end
 
-        assert File.exists?(File.join(@spoolfile, ".test"))
-        assert File.stat(File.join(@spoolfile, ".test")).directory?
-        assert File.exists?(File.join(@spoolfile, ".test", "new"))
-        assert File.stat(File.join(@spoolfile, ".test","new")).directory?
-        assert_equal 0, Dir[File.join(@spoolfile, ".test", "cur", "*")].length
-        assert_equal 1, Dir[File.join(@spoolfile, ".test", "new", "*")].length
+        ensure_maildir_with_n_messages(File.join(@spoolfile,".test"),1)
     end
 
     def test_save_create_mh
@@ -210,12 +207,9 @@ class TC_Gurgitate_delivery < GurgitateTest
             end
         end
 
-        assert File.exists?(File.join(@spoolfile, "test"))
-        assert File.stat(File.join(@spoolfile, "test")).directory?
+        ensure_mhdir_with_messages(File.join(@spoolfile,"test"),1)
         assert File.exists?(File.join(@spoolfile, "test", ".mh_sequences"))
         assert File.stat(File.join(@spoolfile, "test",".mh_sequences")).file?
-        assert File.exists?(File.join(@spoolfile, "test", "1"))
-        assert File.stat(File.join(@spoolfile, "test", "1")).file?
     end
 
     def test_save_bad_filename
@@ -266,35 +260,6 @@ class TC_Gurgitate_delivery < GurgitateTest
             end
         end
 
-        assert File.exists?(File.join(@folders, "test"))
-        assert File.stat(File.join(@folders, "test")).directory?
-        assert File.exists?(File.join(@folders, "test", "new"))
-        assert File.stat(File.join(@folders, "test","new")).directory?
-        assert_equal 0, Dir[File.join(@folders, "test", "cur", "*")].length
-        assert_equal 1, Dir[File.join(@folders, "test", "new", "*")].length
-    end
-
-    def test_message_parsed_correctly
-        assert_equal("From: me",@gurgitate.header("From"))
-        assert_equal("To: you", @gurgitate.header("To"))
-        assert_equal("Subject: test", @gurgitate.header("Subject"))
-        assert_equal("Hi.\n", @gurgitate.body, "Message body is wrong")
-    end
-
-    def test_message_written_correctly
-        test_message_parsed_correctly
-        assert_nothing_raised do
-            @gurgitate.process
-        end
-
-        mess=nil
-        assert_nothing_raised do
-            mess = Gurgitate::Mailmessage.new(File.read(@spoolfile))
-        end
-
-        assert_equal("From: me", mess.header("From"), "From header is wrong")
-        assert_equal("To: you", mess.header("To"), "To header is wrong")
-        assert_equal("Hi.\n", mess.body, "Body is wrong")
-        assert_equal("Subject: test", mess.header("Subject"), "Subject header wrong")
+        ensure_maildir_with_n_messages(File.join(@folders, "test"), 1)
     end
 end
