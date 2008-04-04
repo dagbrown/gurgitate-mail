@@ -40,6 +40,7 @@ EOF
         assert_equal(1,h["From"].length)
         assert_equal("From",h["From"][0].name)
         assert_equal("fromheader@example.com",h["From"][0].contents)
+        assert_equal nil, h["To"]
     end
 
     def test_changing_headers

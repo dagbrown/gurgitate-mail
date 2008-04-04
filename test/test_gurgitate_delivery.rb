@@ -4,8 +4,8 @@ require 'stringio'
 require 'fileutils'
 require 'pathname'
 require 'irb'
-require "./gurgitate-mail"
 require "test/gurgitate-test"
+require "gurgitate-mail"
 
 class TC_Gurgitate_delivery < GurgitateTest
     #************************************************************************
@@ -40,6 +40,23 @@ class TC_Gurgitate_delivery < GurgitateTest
 
         assert Dir[File.join(@spoolfile,"new","*")].length > 0
         assert File.exists?(Dir[File.join(@spoolfile,"new","*")][0])
+        FileUtils.rmtree @spoolfile
+        teardown
+        test_detect_mbox
+        setup
+    end
+
+    def test_detect_mhdir
+        mhdirmake @spoolfile
+
+        assert_nothing_raised do
+            @gurgitate.process { nil }
+        end
+
+        assert File.exists?(@spoolfile)
+        assert File.directory?(@spoolfile)
+        assert File.exists?(File.join(@spoolfile,"1"))
+        assert File.exists?(File.join(@spoolfile,".mh_sequences"))
         FileUtils.rmtree @spoolfile
         teardown
         test_detect_mbox
@@ -83,6 +100,31 @@ class TC_Gurgitate_delivery < GurgitateTest
         assert_equal 1, Dir[File.join(@folders, "test", "new", "*")].length
     end
 
+    def test_save_guess_mh
+        mhdirmake File.join(@folders,"test")
+
+        assert File.exists?(File.join(@folders, "test"))
+        assert File.stat(File.join(@folders, "test")).directory?
+
+        assert_equal 0, Dir[File.join(@folders, "test", "*")].length
+
+        assert_nothing_raised do
+            @gurgitate.process do
+                save "=test"
+                break
+            end
+        end
+
+        assert File.exists?(File.join(@folders, "test"))
+        assert File.stat(File.join(@folders, "test")).directory?
+        assert File.exists?(File.join(@folders, "test", "1"))
+        assert File.stat(File.join(@folders, "test","1")).file?
+        assert File.exists?(File.join(@folders, "test", ".mh_sequences"))
+        assert File.stat(File.join(@folders, "test", ".mh_sequences")).file?
+        assert_equal "unseen: 1\n", 
+            File.read(File.join(@folders, "test", ".mh_sequences"))
+    end
+
     def test_save_maildir_collision
         maildirmake File.join(@folders,"test")
 
@@ -109,6 +151,33 @@ class TC_Gurgitate_delivery < GurgitateTest
         assert_equal 2, Dir[File.join(@folders, "test", "new", "*")].length
     end
 
+    def test_save_mh_collision
+        mhdirmake File.join(@folders,"test")
+
+        assert File.exists?(File.join(@folders, "test"))
+        assert File.stat(File.join(@folders, "test")).directory?
+        assert_equal 0, Dir[File.join(@folders, "test", "*")].length
+
+        assert_nothing_raised do
+            @gurgitate.process do
+                save "=test"
+                save "=test"
+                break
+            end
+        end
+
+        assert File.exists?(File.join(@folders, "test"))
+        assert File.stat(File.join(@folders, "test")).directory?
+        assert File.exists?(File.join(@folders, "test", "1"))
+        assert File.stat(File.join(@folders, "test","1")).file?
+        assert File.exists?(File.join(@folders, "test", "2"))
+        assert File.stat(File.join(@folders, "test","2")).file?
+        assert File.exists?(File.join(@folders, "test", ".mh_sequences"))
+        assert File.stat(File.join(@folders, "test", ".mh_sequences")).file?
+        assert_equal "unseen: 1-2\n", 
+            File.read(File.join(@folders, "test", ".mh_sequences"))
+    end
+
     def test_save_create_maildir
         maildirmake @spoolfile
 
@@ -127,6 +196,26 @@ class TC_Gurgitate_delivery < GurgitateTest
         assert File.stat(File.join(@spoolfile, ".test","new")).directory?
         assert_equal 0, Dir[File.join(@spoolfile, ".test", "cur", "*")].length
         assert_equal 1, Dir[File.join(@spoolfile, ".test", "new", "*")].length
+    end
+
+    def test_save_create_mh
+        maildirmake @spoolfile
+
+        assert_nothing_raised do
+            @gurgitate.process do
+                @folderstyle = Gurgitate::Deliver::MH
+                @maildir = @spoolfile
+                save "=test"
+                break
+            end
+        end
+
+        assert File.exists?(File.join(@spoolfile, "test"))
+        assert File.stat(File.join(@spoolfile, "test")).directory?
+        assert File.exists?(File.join(@spoolfile, "test", ".mh_sequences"))
+        assert File.stat(File.join(@spoolfile, "test",".mh_sequences")).file?
+        assert File.exists?(File.join(@spoolfile, "test", "1"))
+        assert File.stat(File.join(@spoolfile, "test", "1")).file?
     end
 
     def test_save_bad_filename
@@ -209,4 +298,3 @@ class TC_Gurgitate_delivery < GurgitateTest
         assert_equal("Subject: test", mess.header("Subject"), "Subject header wrong")
     end
 end
-

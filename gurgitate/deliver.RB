@@ -7,6 +7,7 @@
 
 require "gurgitate/deliver/mbox"
 require "gurgitate/deliver/maildir"
+require "gurgitate/deliver/mh"
 
 module Gurgitate
     module Deliver
@@ -38,7 +39,7 @@ module Gurgitate
             end
 
             begin
-                [MBox,Maildir].each do |mod|
+                [MBox,Maildir,MH].each do |mod|
                     if mod::check_mailbox(mailbox) then
                         extend mod
                         raise MailboxFound
@@ -59,7 +60,7 @@ module Gurgitate
                     # No hints from the user either.  Let's guess!
                     # I'll use the same heuristic that Postfix uses--if the
                     # mailbox name ends with a /, then make it a Maildir,
-                    # otherwise make it a mail file (sorry, MH users)
+                    # otherwise make it a mail file
                     if mailbox =~ /\/$/ then
                         extend Maildir
                     else

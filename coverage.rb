@@ -29,7 +29,7 @@ module COVERAGE__
                     elsif /^\s*(?:begin\s*(?:#.*)?|ensure\s*(?:#.*)?|else\s*(?:#.*)?)$/ =~ line and covers[c + 1 + 1]
                         covers[c + 1] = covers[c + 1 + 1]
                         marked = true
-                    elsif /^\s*(?:end|})\s*$/ =~ line && covers[c + 1 - 1]
+                    elsif /^\s*(?:end|\})\s*$/ =~ line && covers[c + 1 - 1]
                         covers[c + 1] = covers[c + 1 - 1]
                         marked = true
                     end

@@ -4,6 +4,11 @@
 # 
 #------------------------------------------------------------------------
 
+builddir = File.join(File.dirname(__FILE__),"..")
+unless $:[0] == builddir
+    $:.unshift builddir
+end
+
 require 'test/unit'
 require 'test/unit/ui/console/testrunner'
 require 'stringio'
@@ -11,11 +16,8 @@ require 'stringio'
 class TC_Header < Test::Unit::TestCase
 
     def setup
-        require './gurgitate-mail'
+        require 'gurgitate-mail'
     end
-
-    # def teardown
-    # end
 
     def test_simple_header
         h=Gurgitate::Header.new("From: fromheader@example.com")

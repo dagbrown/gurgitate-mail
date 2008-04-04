@@ -1,10 +1,19 @@
 #/opt/bin/ruby -w
 
+builddir = File.join(File.dirname(__FILE__),"..")
+unless $:[0] == builddir
+    $:.unshift builddir
+end
+
 require 'test/unit'
 require 'test/unit/ui/console/testrunner'
 require 'stringio'
 
 class TC_Writing < Test::Unit::TestCase
+    def setup
+        require 'gurgitate-mail'
+    end
+
     def test_null_message
         assert_nothing_raised do
             Gurgitate::Mailmessage.new
@@ -102,7 +111,7 @@ class TC_Writing < Test::Unit::TestCase
         assert_equal "sender@test", mess.from
         assert_equal "recipient@test", mess.to
         assert_equal "This is a test", mess.body
-        assert_equal "From: from@test", mess.headers["From"].to_s
-        assert_equal "To: to@test", mess.headers["To"].to_s
+        assert_equal "From: from@test", (mess.headers["From"]).to_s
+        assert_equal "To: to@test", (mess.headers["To"]).to_s
     end
 end

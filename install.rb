@@ -1,7 +1,7 @@
 #!/usr/bin/ruby -w
 
 require "rbconfig"
-require "ftools"
+require "fileutils"
 
 module Gurgitate
     Package = "gurgitate-mail"
@@ -38,19 +38,19 @@ module Gurgitate
                 sitedir = CONFIG["sitedir"]
                 bindir  = CONFIG["bindir"]
                 mandir  = File.join(CONFIG["mandir"],"man1")
-                dest    = File.join(sitedir,version)
+                dest    = CONFIG["sitelibdir"]
             end
 
             destgur = File.join(dest,"gurgitate")
             destdel = File.join(destgur,"deliver")
 
             print "Installing #{Package}.rb in #{dest}...\n"
-            File.install("#{Package}.rb", dest, 0644)
+            FileUtils.install("#{Package}.rb", dest, :mode => 0644)
             
             mkdir destgur
             Dir.glob(File.join("gurgitate","*.rb")).each { |f|
                 puts "Installing #{f} in #{destgur}..."
-                File.install(f,destgur)
+                FileUtils.install(f,destgur)
             }
 
             mkdir destdel
@@ -58,11 +58,12 @@ module Gurgitate
             Dir.glob(File.join(File.join("gurgitate","deliver"),"*.rb")).each {
             |f|
                 puts "Installing #{f} in #{destdel}..."
-                File.install(f,destdel)
+                FileUtils.install(f,destdel)
             }
 
             print "Installing #{Package}.1 in #{mandir}...\n"
-            File.install("#{Package}.man","#{mandir}/#{Package}.1", 0644)
+            FileUtils.install("#{Package}.man","#{mandir}/#{Package}.1", 
+                              :mode => 0644)
 
             print "Installing #{Package} in #{bindir}...\n"
             # Not so simple; need to put in the shebang line

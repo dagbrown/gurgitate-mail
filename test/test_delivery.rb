@@ -4,8 +4,8 @@ require 'stringio'
 require 'fileutils'
 require 'pathname'
 require 'irb'
-require "./gurgitate-mail"
 require "test/gurgitate-test"
+require "gurgitate-mail"
 
 class TC_Delivery < GurgitateTest
     #************************************************************************

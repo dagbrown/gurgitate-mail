@@ -1,10 +1,16 @@
+builddir = File.join(File.dirname(__FILE__),"..")
+unless $:[0] == builddir
+    $:.unshift builddir
+end
+
 require 'test/unit'
 require 'test/unit/ui/console/testrunner'
 require 'stringio'
 require 'fileutils'
 require 'pathname'
 require 'irb'
-require "./gurgitate-mail"
+require "gurgitate-mail"
+require "test/gurgitate-test"
 
 class TC_Process < GurgitateTest
     #************************************************************************
