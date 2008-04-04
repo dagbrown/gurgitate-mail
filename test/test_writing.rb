@@ -36,6 +36,8 @@ class TC_Writing < Test::Unit::TestCase
             :from => "test@test", 
             :to => "test2@test"
         assert_equal "This is a test", mess.body
+        assert_equal [ "From: test@test", "To: test2@test" ], 
+            mess.headers.to_s.split(/\n/)
     end
 
     def test_initialization_headers_body_in_initialization_hash
@@ -43,6 +45,8 @@ class TC_Writing < Test::Unit::TestCase
             :from => "test@test", 
             :to => "test2@test"
         assert_equal "This is a test", mess.body
+        assert_equal [ "From: test@test", "To: test2@test" ], 
+            mess.headers.to_s.split(/\n/)
     end
 
     def test_creation_round_trip
@@ -52,5 +56,53 @@ class TC_Writing < Test::Unit::TestCase
             :subject => "Test subject"
         reparsed_mess = Gurgitate::Mailmessage.new(mess.to_s)
         assert_equal reparsed_mess.to_s, mess.to_s
+    end
+
+    def test_creation_sender_specified
+        mess = Gurgitate::Mailmessage.create :body => "This is a test",
+            :from => "from@test",
+            :to => "to@test",
+            :sender => "sender@test"
+        assert_equal "This is a test", mess.body
+        assert_equal "From: from@test", mess.headers["From"].to_s
+        assert_equal "To: to@test", mess.headers["To"].to_s
+        assert_equal "sender@test", mess.from
+    end
+
+    def test_creation_recipient_specified
+        mess = Gurgitate::Mailmessage.create :body => "This is a test",
+            :from => "from@test",
+            :to => "to@test",
+            :recipient => "recipient@test"
+        assert_equal "This is a test", mess.body
+        assert_equal "From: from@test", mess.headers["From"].to_s
+        assert_equal "To: to@test", mess.headers["To"].to_s
+        assert_equal "recipient@test", mess.to
+    end
+
+    def test_creation_sender_not_specified
+        mess = Gurgitate::Mailmessage.create :body => "This is a test",
+            :from => "from@test",
+            :to => "to@test"
+        assert_equal "This is a test", mess.body
+        assert_equal "From: from@test", mess.headers["From"].to_s
+        assert_equal "To: to@test", mess.headers["To"].to_s
+        assert_equal "", mess.from
+        assert_equal "to@test", mess.to
+    end
+
+    def test_creation_incrementally
+        mess = Gurgitate::Mailmessage.create
+        mess.sender = "sender@test"
+        mess.recipient = "recipient@test"
+        mess.body = "This is a test"
+        mess.headers["From"] = "from@test"
+        mess.headers["To"] = "to@test"
+
+        assert_equal "sender@test", mess.from
+        assert_equal "recipient@test", mess.to
+        assert_equal "This is a test", mess.body
+        assert_equal "From: from@test", mess.headers["From"].to_s
+        assert_equal "To: to@test", mess.headers["To"].to_s
     end
 end

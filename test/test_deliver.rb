@@ -73,21 +73,4 @@ class TC_Deliver < Test::Unit::TestCase
         assert File.exists?(contents[0])
         assert_equal File.read(contents[0]), @deliver_test.to_s
     end
-
-    def test_basic_delivery_mh
-        @deliver_test.folderstyle = Gurgitate::Deliver::MH
-        assert_nothing_raised do
-            @deliver_test.save(@spoolfile)
-        end
-
-        assert File.exists?(@spoolfile)
-        assert File.directory?(@spoolfile)
-        
-        mess = File.join(@spoolfile,"1")
-        seq  = File.join(@spoolfile,".mh_sequences")
-        assert File.exists?(mess)
-        assert File.exists?(seq)
-        assert_equal File.read(mess), @deliver_test.to_s
-        assert_equal File.read(seq), "unseen: 1\n"
-    end
 end

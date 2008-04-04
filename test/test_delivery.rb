@@ -12,15 +12,6 @@ class TC_Delivery < GurgitateTest
     # tests
     #************************************************************************
 
-    def basic_maildir_delivery_tests(mailbox)
-        assert File.exists?(mailbox)
-        assert File.stat(mailbox).directory?
-        assert File.exists?(File.join(mailbox, "new"))
-        assert File.stat(File.join(mailbox,"new")).directory?
-        assert_equal 0, Dir[File.join(mailbox, "cur", "*")].length
-        assert_equal 1, Dir[File.join(mailbox, "new", "*")].length
-    end
-
     def test_basic_delivery
         assert_nothing_raised do
             @gurgitate.process { nil }
@@ -85,7 +76,12 @@ class TC_Delivery < GurgitateTest
             end
         end
 
-        basic_maildir_delivery_tests(File.join(@folders, "test"))
+        assert File.exists?(File.join(@folders, "test"))
+        assert File.stat(File.join(@folders, "test")).directory?
+        assert File.exists?(File.join(@folders, "test", "new"))
+        assert File.stat(File.join(@folders, "test","new")).directory?
+        assert_equal 0, Dir[File.join(@folders, "test", "cur", "*")].length
+        assert_equal 1, Dir[File.join(@folders, "test", "new", "*")].length
     end
 
     def test_save_maildir_collision
@@ -182,7 +178,12 @@ class TC_Delivery < GurgitateTest
             end
         end
 
-        basic_maildir_delivery_tests(File.join(@folders,"test"))
+        assert File.exists?(File.join(@folders, "test"))
+        assert File.stat(File.join(@folders, "test")).directory?
+        assert File.exists?(File.join(@folders, "test", "new"))
+        assert File.stat(File.join(@folders, "test","new")).directory?
+        assert_equal 0, Dir[File.join(@folders, "test", "cur", "*")].length
+        assert_equal 1, Dir[File.join(@folders, "test", "new", "*")].length
     end
 
     def test_message_parsed_correctly

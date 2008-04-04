@@ -19,7 +19,6 @@ class TC_Rules < GurgitateTest
 
     def teardown
         File.unlink rulesfile if File.exist? rulesfile
-        super
     end
 
     def test_add_rules_normal
