@@ -64,7 +64,7 @@ end
 
 task :clean => :gem_cleanup do
     delete_all(*Targets+["pod2htm*~~","*.tmp",
-        "gurgitate-mail.text","doc","*~"]) 
+        "gurgitate-mail.text","doc","*~"]-["README"]) 
 end
 
 task :gem_cleanup do
