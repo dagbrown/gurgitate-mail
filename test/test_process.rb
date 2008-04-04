@@ -1,16 +1,11 @@
-builddir = File.join(File.dirname(__FILE__),"..")
-unless $:[0] == builddir
-    $:.unshift builddir
-end
-
 require 'test/unit'
 require 'test/unit/ui/console/testrunner'
 require 'stringio'
 require 'fileutils'
 require 'pathname'
 require 'irb'
-require "gurgitate-mail"
-require "test/gurgitate-test"
+require "./gurgitate-mail"
+require "./test/gurgitate-test.rb"
 
 class TC_Process < GurgitateTest
     #************************************************************************
@@ -27,6 +22,17 @@ class TC_Process < GurgitateTest
 		assert_nothing_raised do
 			@gurgitate.process { pipe('cat > /dev/null') }
 		end
+    end
+
+    def test_bad_pipe_goes_to_spoolfile_anyway
+        assert_nothing_raised do
+            # if you have a program called this on your system,
+            # I want to see its man page
+            @gurgitate.process { pipe("/bin/flortglenuggets >/dev/null 2>&1") }
+        end
+
+        assert File.exists?(@spoolfile)
+        assert File.stat(@spoolfile).file?
     end
 
     def test_break_does_not_deliver
