@@ -17,8 +17,7 @@
 #       http://jimweirich.umlcoop.net/packages/rake/
 #========================================================================
 
-require 'fileutils'
-
+require 'ftools'
 begin
     require "rake/classic_namespace"
 rescue nil
@@ -28,11 +27,10 @@ Package = "gurgitate-mail"
 
 Modules =  %w{gurgitate/deliver.rb
              gurgitate/headers.rb 
-             gurgitate/header.rb 
              gurgitate/mailmessage.rb
              gurgitate/deliver/maildir.rb
-             gurgitate/deliver/mbox.rb
-             gurgitate/deliver/mh.rb}
+             gurgitate/deliver/mh.rb
+             gurgitate/deliver/mbox.rb}
 
 Targets = %w{gurgitate-mail.rb
              gurgitate-mail
@@ -119,6 +117,7 @@ task :doc => "gurgitate-mail.rb" do |task|
 end
 
 task :test => :default do
+    $:.unshift(File.dirname(__FILE__))
     require './test/runtests'
 
     testcases = Dir[File.join("tests","test_*")].map do |file|
@@ -145,7 +144,7 @@ def ruby_compile(task)
     task.prerequisites.each do |p|
         run("ruby -w -c #{p}")
     end
-    FileUtils.cp(task.prerequisites[0], task.name)
+    File.copy(task.prerequisites[0], task.name, true)
 end    
 
 file("gurgitate-mail.rb" => ["gurgitate-mail.RB"]) { |t| ruby_compile(t) }
@@ -157,7 +156,7 @@ end
 file "README" => "gurgitate-mail.text" do |t|
     t.sources=[t.prerequisites[0]]
     Task[t.source].invoke
-    FileUtils.cp(t.source, t.name)
+    File.copy(t.source, t.name, true)
 end
 
 %w{html text}.each do |s|

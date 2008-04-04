@@ -70,6 +70,10 @@ module Gurgitate
                     make_mailbox(mailbox)
                 end
 
+                unless File.stat(mailbox).directory?
+                    raise SystemError, 'not a directory'
+                end
+
                 tmpfilename=maildir_getfilename(File.join(mailbox,"tmp"))
                 File.open(tmpfilename,File::CREAT|File::WRONLY) do |fh|
                     fh.write(self.to_s)
