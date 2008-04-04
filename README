@@ -1,0 +1,374 @@
+NAME
+    gurgitate-mail - an easy-to-use mail filter
+
+SYNOPSIS
+    gurgitate-mail
+
+DESCRIPTION
+    "gurgitate-mail" is a program which reads your mail and filters it
+    according to the .gurgitate-rules.rb file in your home directory. The
+    configuration file uses Ruby syntax and is thus quite flexible.
+
+    It's generally invoked either through your .forward file:
+
+        "|/path/to/gurgitate-mail"
+
+    Or through your .procmailrc file:
+
+        :0:
+        | /path/to/gurgitate-mail
+
+    Alternatively, if you're the sysadmin at your site, or your sysadmin is
+    friendly, you can use gurgitate-mail as a local delivery agent. For
+    postfix, put
+
+        mailbox_command=/opt/bin/gurgitate-mail
+
+    in /etc/postfix/main.cf. If you use any other MTA, and configure
+    gurgitate-mail as a local delivery agent, please tell me how! I want to
+    include this in the documentation.
+
+CONFIGURATION FILES
+    There are three configuration files used by gurgitate-mail: two are
+    system-wide, and the third, is the user rules file.
+
+    The two system-wide configuration files are /etc/gurgitate-rules and
+    /etc/gurgitate-rules-default. These are processed before and after the
+    user rules, respectively.
+
+    /etc/gurgitate-rules is used to handle system-wide filtering needs:
+    setting the default mailbox style to Maildir rather than the default
+    MBox, setting the spool directory, things like that.
+
+    The user configuration file is $HOME/.gurgitate-rules (or,
+    alternatively, $HOME/.gurgitate-rules.rb. Either work). You put your own
+    rules here. If the user configuration file doesn't encounter a "return"
+    during processing, then the additional rules contained in
+    /etc/gurgitate-rules-default are run. If that also doesn't return, then
+    mail messages are saved into the default mail spool location.
+
+    If the "-f" option is used on the commandline, then the file specified
+    will be used and the default rules will not. The "-f" option can be used
+    more than once:
+
+        gurgitate-mail -f test-rules -f additional-rules
+
+CONFIGURATION PARAMETERS
+    There are several parameters that you can set to change the way that
+    gurgitate-mail behaves. You set a config parameter by saying, for
+    instance:
+
+        sendmail "/usr/sbin/sendmail"
+
+    which sets the "sendmail" parameter to "/usr/sbin/sendmail".
+
+    maildir
+         The directory you want to put mail folders into. This defaults to
+         $HOME/Mail.
+
+    logfile
+         Where you went gurgitate-mail's log messages to go to. The standard
+         location for this is $HOME/.gurgitate.log
+
+    sendmail
+         The full path to the sendmail program, used to deliver mail. This
+         can be any program that takes as its parameters the list of
+         addresses to deliver mail to, and that takes a mail message on
+         standard input.
+
+    homedir
+         The full path of your home directory. This defaults to whatever
+         your actual home directory is.
+
+    spooldir
+         The path where the system's mail spools goes to. This defaults to
+         "/var/spool/mail". On a Maildir system, this should be set to the
+         same as "homedir".
+
+    spoolfile
+         The mail spool file component of the full path of your mail spool.
+         This is generally your username. Maildir users should set this to
+         "Maildir".
+
+    folderstyle
+         The style of folders you prefer. This can be (at the moment) either
+         MBox or Maildir.
+
+FILTER RULES
+    The filter rules are a series of Ruby statements, with the following
+    methods and variables available:
+
+  Variables
+    from This contains the envelope "from" address of the email message.
+         (Note that this isn't necessarily the same as the contents of the
+         "From:" header)
+
+    headers
+         This is an object containing the headers of the message. There are
+         several methods that come with this object:
+
+    body This contains the body of the email message. As of yet, there's
+         nothing really interesting which you can do with this, apart from
+         assigning to it; you can rewrite the body of an email message this
+         way. Dealing with attachments is planned for a future release of
+         "gurgitate-mail".
+
+    maildir
+         The directory which contains the folders, used by the "save" method
+         when you specify a folder as "=folder" (like Elm). Defaults to
+         "$HOME/Mail".
+
+    homedir
+         Your home directory. Read-only.
+
+    logfile
+         The location of the "gurgitate-mail" logfile. If set to "nil", then
+         no logging is done. Defaults to "$HOME/.gurgitate.log".
+
+    sendmail
+         The location of the "sendmail" program. Used by the "forward"
+         method. Defaults to "/usr/lib/sendmail".
+
+    spoolfile
+         The location of the mail spool. Read-only.
+
+  Methods
+    matches(name(s),regex)
+         Returns "true" if the header "name" matches the regular expression
+         "regex". If "name" is an array of header names, then it returns
+         true if at least one of the headers matches. Useful for testing
+         whether both "To:" and "Cc:" headers match.
+
+    from Returns the envelope "from" address of the email message. Note that
+         this is the same as the bare "from".
+
+    to   Returns a HeaderBag (a kind of array) with the contents of the "To"
+         and the "Cc" headers.
+
+    to_s As per Ruby convention, returns all the headers as a "String"
+         object.
+
+    save(mailbox)
+         This saves the message to a mailbox. You can specify the mailbox as
+         a word with an = sign in front of it, in which case it puts it into
+         "maildir". If you don't use the =name format, then you need to
+         specify an absolute pathname. If it can't write the message to the
+         file you request it to, it'll attempt to write it to "spoolfile".
+
+    forward(address)
+         This forwards the email message to another email address.
+
+    pipe(program)
+         This pipes the message through "program". "pipe" returns the exit
+         code of the program that the message was piped through.
+
+    filter(program)
+         This pipes the message through "program" and returns a new
+         Gurgitate object containing the filtered mail. (This is handy for
+         external filters which modify email like, for example,
+         SpamAssassin, which adds a spam-score header.)
+
+         You can also say
+
+             filter(program) do
+                 # code here
+             end
+
+         and it yields the newly-created Gurgitate object to the block.
+
+    headers
+         This returns the headers as an object of their own. This object has
+         its own methods:
+
+         headers[*headernames]
+              This returns a HeaderBag (a subclass of array) containing the
+              headers you asked for. You can then use the =~ operator on
+              this result to match the RHS regex with everything in the
+              HeaderBag.
+
+              You can change a header's value with "headers[name]=newvalue".
+
+         headers.match(name,regex)
+              Matches the header with the name "name" against the regex.
+              This is the same as headers[name] =~ /regex/.
+
+         headers.matches(names,regex)
+              Matches the headers with the names "names" against the regex.
+              This is the same as headers[*names] =~ /regex/.
+
+         headers.from
+              Returns the envelope from. You can change this with
+              "headers.from=newaddress" too.
+
+    return
+         This tells "gurgitate-mail" to stop processing the email message.
+         If you don't use "return", then "gurgitate-mail" will continue
+         processing the same mail again with the next rule. If there isn't a
+         "return" at the end of gurgitate-rules.rb, then "gurgitate-mail"
+         will save the email message in the normal mail spool.
+
+    log(message)
+         This writes a log message to the log file.
+
+SIMPLE EXAMPLES
+    Here are some examples of "gurgitate-mail" rules, with explanations:
+
+        if from =~ /ebay.com/ then save("=ebay"); return; end
+
+    Any email from eBay (automatic end-of-auction notifications, for
+    example, and outbid notices) gets filed into the "ebay" folder.
+
+        if from =~ /root@/ then save("=root"); return; end
+
+    Any email from root (at any host) gets filed into a special folder.
+    Useful for sysadmins monitoring crontab email.
+
+        if headers.matches(["To","Cc"],"webmaster@") then
+            save("=webmaster")
+            return
+        end
+
+    Any email with a To: or Cc: line of "sysadmin" is saved to a "sysadmin"
+    folder. Useful for people with multiple role accounts redirected to
+    their address.
+
+        if headers["Subject"] =~ /\[SPAM\]/ then
+            save("=spam")
+            return
+        end
+
+    This is a different syntax for matching patterns against headers. You
+    can also match multiple headers in the square brackets.
+
+        if headers["Subject","Keywords"] =~ /a bad word/ then
+            save("=swearing")
+            return
+        end
+
+    Searches for "a bad word" in the Subject and Keywords headers, and if
+    it's there, saves the email in the "swearing" folder.
+
+        if headers.matches(["To","Cc"],"mailing-list@example.com") then
+            pipe("|rcvstore +mailing-list")
+            return
+        end
+
+    Any email to a mailing list is piped through "rcvstore" to store it into
+    an MH folder.
+
+    That
+
+        headers.matches(["To","Cc"],/regex/)
+
+    idiom happens often enough that there's a shorthand for it:
+
+        if to =~ /mailing-list@example.com/ then
+            pipe("|rcvstore +mailing-list")
+            return
+        end
+
+    Pipes the mail to the mailing list through "rcvstore".
+
+ADVANCED EXAMPLES
+    Here are some slightly more clever examples to give you an idea of what
+    you can do with "gurgitate-mail". Let's suppose you have an email
+    whitelist in a file called $HOME/.friends, so you can determine whether
+    some email is likely to be spam or not.
+
+    Then if someone on your whitelist sends you email, then you
+    automatically save that into the "inbox" folder:
+
+        friends=homedir+"/.friends"
+        if FileTest.exists?(friends) and FileTest.readable?(friends) then
+            File.new(friends).each do |friend|
+                if from =~ friend.chomp then
+                    log "Mail from friend "+friend.chomp
+                    save("=inbox")
+                    return
+                end
+            end
+        end
+
+    Okay, if someone sends you email, and it's addressed specifically to you
+    (and gurgitate-mail hasn't caught it in another form already), then it
+    might or might not be spam: put it into a "grey" folder:
+
+        my_addresses= [ /me@example\.com/i,
+                        /me@example\.org/i,
+                        /me@example\.net/i];  # I have three email addresses
+        my_addresses.each do |addr|
+            if headers.matches(["To","Cc"],addr) then
+                save("=possibly-not-spam")
+                return
+            end
+        end
+
+    And after that, if it's not from someone you know, and it's not
+    addressed to your email address either, then it's probably save to
+    assume that it's spam:
+
+        save("=spam")
+        return
+
+    This can be improved by using a Bayesian filter, though; for example,
+    Eric Raymond's bogofilter program (http://bogofilter.sourceforge.net)
+    can be automatically trained and used with the help of the
+    white/grey/black distinctions. Taking the example above, I'll adjust it
+    by adding in calls to bogofilter:
+
+        friends=homedir+"/.friends"
+        if FileTest.exists?(friends) and FileTest.readable?(friends) then
+            File.new(friends).each do |friend|
+                if from =~ friend.chomp then
+                    log "Mail from friend "+friend.chomp
+                    pipe("bogofilter -h")  # <-- LINE ADDED HERE
+                    save("=inbox")
+                    return
+                end
+            end
+        end
+
+    "bogofilter -h" trains bogofilter that mail from whitelisted-people is
+    not to be considered spam. Okay, at the end of the .gurgitate-rules,
+    change
+
+        save("=spam")
+        return
+
+    to
+
+        save("=spam")
+        pipe("bogofilter -s")
+        return
+
+    This trains "bogofilter" that anything which doesn't pass the rest of
+    the filter should be considered spam. Now for the interesting bit:
+    Change the bit between these to use "bogofilter" to decide whether email
+    is to be considered spam or not:
+
+        my_addresses= [ /me@example\.com/i,
+                        /me@example\.org/i,
+                        /me@example\.net/i];  # I have three email addresses
+        my_addresses.each do |addr|
+            if headers.matches(["To","Cc"],addr) then
+                if pipe("bogofilter")==1
+                then
+                    log("bogofilter suspects it might not be spam")
+                    save("=possibly-not-spam")
+                else
+                    log("bogofilter thinks it's probably spam")
+                    save("=spam")
+                end
+                return
+            end
+        end
+
+    "bogofilter" has an exit code of "1" if it thinks the message is not
+    spam, and "0" if it thinks the message is spam.
+
+    Hopefully this should give you an idea of the kinds of things that you
+    can use "bogofilter" for.
+
+AUTHOR
+    Dave Brown <gurgitate-mail@dagbrown.com>
+
