@@ -15,7 +15,7 @@ module Gurgitate
             #   message to.  If it is of the form "=mailbox", it saves
             #   the message to +Maildir+/+mailbox+.  Otherwise, it
             #   simply saves the message to the file +mailbox+.
-            def self::check_mailbox(mailbox)
+            def self::check_mailbox mailbox
                 begin
                     if File.stat(mailbox).directory? then
                         if File.stat(File.join(mailbox,"cur")).directory? then
@@ -33,7 +33,7 @@ module Gurgitate
             #   One of "+mailbox+/tmp" or "+mailbox+/new", but that's
             #   only because that's what the maildir spec
             #   (http://cr.yp.to/proto/maildir.html) says.
-            def maildir_getfilename(dir)
+            def maildir_getfilename dir
                 time=Time.now.to_f
                 counter=0
                 hostname=Socket::gethostname
@@ -50,7 +50,7 @@ module Gurgitate
             # Creates a new Maildir folder +mailbox+
             # mailbox::
             #   The full path of the new folder to be created
-            def make_mailbox(mailbox)
+            def make_mailbox mailbox
                 Dir.mkdir(mailbox)
                 %w{cur tmp new}.each do |dir|
                     Dir.mkdir(File.join(mailbox,dir))
@@ -63,7 +63,7 @@ module Gurgitate
             #   message to.  If it is of the form "=mailbox", it saves
             #   the message to +Maildir+/+mailbox+.  Otherwise, it
             #   simply saves the message to the file +mailbox+.
-            def deliver_message(mailbox)
+            def deliver_message mailbox
                 begin
                     File.stat(mailbox)
                 rescue Errno::ENOENT

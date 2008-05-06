@@ -15,7 +15,7 @@ module Gurgitate
             #   the message to.  If it is of the form "=mailbox", it
             #   saves the message to +Maildir+/+mailbox+.  Otherwise,
             #   it simply saves the message to the file +mailbox+.
-            def self::check_mailbox(mailbox)
+            def self::check_mailbox mailbox
                 begin
                     # Rather annoyingly, pretty well any directory can
                     # be a MH mailbox, but this just checks to make sure
@@ -24,10 +24,10 @@ module Gurgitate
                     # I could put in a check for the path given in
                     # $HOME/.mh_profile, but Claws-Mail uses MH mailboxes and
                     # disregards $HOME/.mh_profile.
-                    if File.stat(mailbox).directory? and 
-                        not ( File.exists?(File.join(mailbox, "cur")) or 
-                              File.exists?(File.join(mailbox, "tmp")) or 
-                              File.exists?(File.join(mailbox, "new"))) then 
+                    if File.stat(mailbox).directory? and
+                        not ( File.exists?(File.join(mailbox, "cur")) or
+                              File.exists?(File.join(mailbox, "tmp")) or
+                              File.exists?(File.join(mailbox, "new"))) then
                         return MH
                     end
                 rescue Errno::ENOENT
@@ -41,7 +41,7 @@ module Gurgitate
             #   the message to.  If it is of the form "=mailbox", it
             #   saves the message to +Maildir+/+mailbox+.  Otherwise,
             #   it simply saves the message to the file +mailbox+.
-            def deliver_message(mailbox) 
+            def deliver_message mailbox
                 if ! File.exists? mailbox then
                     Dir.mkdir(mailbox)
                 end
@@ -59,16 +59,16 @@ module Gurgitate
 
             private
 
-            def update_sequences(mailbox, msgnum)
+            def update_sequences mailbox, msgnum
                 sequences = File.join(mailbox, ".mh_sequences")
                 lockfile = sequences + ".lock" # how quaint
                 loop do
                     begin
-                        File.open(lockfile, 
-                                  File::WRONLY | 
-                                  File::CREAT | 
+                        File.open(lockfile,
+                                  File::WRONLY |
+                                  File::CREAT |
                                   File::EXCL ) do |lock|
-                            File.open(sequences, 
+                            File.open(sequences,
                                       File::RDWR | File::CREAT) do |seq|
 
                                 seq.flock(File::LOCK_EX)
@@ -91,7 +91,7 @@ module Gurgitate
                     rescue Errno::EEXIST
                         # some other process is doing something, so wait a few
                         # milliseconds until it's done
-                        sleep(0.01) 
+                        sleep(0.01)
                     end
                 end
             end
@@ -115,13 +115,13 @@ module Gurgitate
                 end
             end
 
-            def next_message(mailbox)
+            def next_message mailbox
                 next_msgnum = Dir.open(mailbox).map { |ent| ent.to_i }.max + 1
                 loop do
                     begin
                         File.open(File.join(mailbox, next_msgnum.to_s),
-                                  File::WRONLY | 
-                                  File::CREAT | 
+                                  File::WRONLY |
+                                  File::CREAT |
                                   File::EXCL ) do |filehandle|
                             yield filehandle
                         end

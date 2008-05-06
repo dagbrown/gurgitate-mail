@@ -13,10 +13,10 @@ module Gurgitate
             #   the message to.  If it is of the form "=mailbox", it
             #   saves the message to +Maildir+/+mailbox+.  Otherwise,
             #   it simply saves the message to the file +mailbox+.
-            def self::check_mailbox(mailbox)
+            def self::check_mailbox mailbox
 
                 begin
-                    if File.stat(mailbox).file? then 
+                    if File.stat(mailbox).file? then
                         return MBox
                     else
                         return nil
@@ -32,9 +32,9 @@ module Gurgitate
             #   the message to.  If it is of the form "=mailbox", it
             #   saves the message to +Maildir+/+mailbox+.  Otherwise,
             #   it simply saves the message to the file +mailbox+.
-            def deliver_message(mailbox) 
-                File.open(mailbox,File::WRONLY | 
-                                  File::APPEND | 
+            def deliver_message mailbox
+                File.open(mailbox,File::WRONLY |
+                                  File::APPEND |
                                   File::CREAT) do |f|
                     f.flock(File::LOCK_EX)
                     message=(if f.stat.size > 0 then "\n" else "" end) + to_mbox
