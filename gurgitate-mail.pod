@@ -4,7 +4,7 @@ gurgitate-mail - an easy-to-use mail filter
 
 =head1 SYNOPSIS
 
-gurgitate-mail
+gurgitate-mail [-s SENDER] [-f RULESFILE] [-h]
 
 =head1 DESCRIPTION
 
@@ -31,6 +31,28 @@ postfix, put
 in F</etc/postfix/main.cf>.  If you use any other MTA, and configure
 gurgitate-mail as a local delivery agent, please tell me how!  I want to
 include this in the documentation.
+
+=head1 COMMAND LINE OPTIONS
+
+gurgitate-mail lets you alter its default behaviour with some command-line
+flags:
+
+=over 5
+
+=item -s SENDER
+
+Sets the envelope sender to SENDER.
+
+=item -f RULESFILE
+
+Uses RULESFILE as the source for gurgitate-rules rather than the default 
+F</$HOME/.gurgitate-rules>.
+
+=item -h
+
+Outputs a quick summary of the options available.
+
+=back
 
 =head1 CONFIGURATION FILES
 
