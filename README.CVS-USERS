@@ -1,10 +1,10 @@
 Hi.
 
-If you're reading this file, that means you pulled this out of
-CVS, which might not be necessarily what you wanted.  If you're
-downloading gurgitate-mail, odds are you actually want to use it
-(if you are interested in doing development on it, though, send me
-an email).
+If you're reading this file, that means you pulled this out of CVS
+(or, hey, git), which might not be necessarily what you wanted.
+If you're downloading gurgitate-mail, odds are you actually want
+to use it (if you are interested in doing development on it,
+though, send me an email).
 
 The best way to get started, since you're here, is to say "rake
 tarball", which will get you a tar file of the sort that you'd
