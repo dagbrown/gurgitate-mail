@@ -9,32 +9,66 @@ require 'gurgitate/mailmessage'
 require 'gurgitate/deliver'
 
 module Gurgitate
-    #========================================================================
-    # The actual gurgitator; reads a message and then it can do
-    # other stuff with it, like save to a mailbox or forward
+    # This is the actual gurgitator; it reads a message and then it can
+    # do other stuff with it, like saving it to a mailbox or forwarding
     # it somewhere else.
+    #
+    # To set configuration parameters for gurgitate-mail, use a keyword-
+    # based system.  It's almost like an attribute, only if you give the
+    # accessor a parameter, it will set the configuration parameter to
+    # the parameter's value.  For instance:
+    # 
+    #  maildir "#{homedir}/Mail"
+    #  sendmail "/usr/sbin/sendmail"
+    #  spoolfile "Maildir"
+    #  spooldir homedir
+    #
+    # (This is because of an oddity in Ruby where, even if an
+    # accessor exists in the current object, if you say:
+    #    name = value
+    # it'll always create a local variable.  Not quite what you
+    # want when you're trying to set a config parameter.  You have
+    # to say <code>self.name = value</code>, which [I think] is ugly.
+    #
+    # In the interests of promoting harmony, of course, 
+    # <code>self.name = value</code> still works.)
+    #
+    # The attributes you can define are:
+    #
+    # homedir ::  Your home directory.  This defaults to what your
+    #             actual home directory is.
+    #
+    # maildir :: The directory you store your mail in.  This defaults
+    #            to the "Mail" directory in your home dir.
+    #
+    # logfile :: The path to your gurgitate-mail log file.  If you
+    #            set this to +nil+, gurgitate-mail won't log anything.
+    #            The default value is ".gurgitate.log" in your home
+    #            directory.
+    #
+    # The following parameters are more likely to be interesting to the
+    # system administrator than the everyday user.
+    #
+    # sendmail :: The full path of your "sendmail" program, or at least
+    #             a program that provides functionality equivalent to
+    #             sendmail.
+    #
+    # spoolfile :: The default location to store mail messages, for the
+    #              messages that have been unaffected by your gurgitate
+    #              rules.  If an exception is raised by your rules, the
+    #              message will be delivered to the spoolfile.
+    #
+    # spooldir :: The location where users' system mail boxes live.
+    #
+    # folderstyle :: The style of mailbox to create (and to expect,
+    #                although gurgitate-mail automatically detects the 
+    #                type of existing mailboxes).  See the separate
+    #                documentation for folderstyle for more details.
+    
     class Gurgitate < Mailmessage
         include Deliver
 
-        # Instead of the usual attributes, I went with a
-        # reader-is-writer type thing (as seen quite often in Perl and
-        # C++ code) so that in your .gurgitate-rules, you can say
-        # 
-        # maildir "#{homedir}/Mail"
-        # sendmail "/usr/sbin/sendmail"
-        # spoolfile "Maildir"
-        # spooldir homedir
-        #
-        # This is because of an oddity in Ruby where, even if an
-        # accessor exists in the current object, if you say:
-        #    name = value
-        # it'll always create a local variable.  Not quite what you
-        # want when you're trying to set a config parameter.  You have
-        # to say "self.name = value", which (I think) is ugly.
-        #
-        # In the interests of promoting harmony, of course, the previous
-        # syntax will continue to work.
-        def self.attr_configparam(*syms)
+        def self.attr_configparam(*syms) #:nodoc:
             syms.each do |sym|
                 class_eval %/
                     def #{sym} (*vals)
@@ -78,8 +112,37 @@ module Gurgitate
         # What kind of mailboxes you prefer
         # attr_configparam :folderstyle
 
-        # What kind of mailboxes you prefer
-        def folderstyle(*style)
+        # What kind of mailboxes you prefer.  Treat this like a
+        # configuration parameter.  If no argument is given, then 
+        # return the current default type.
+        #
+        # Depending on what you set this to, some other configuration
+        # parameters change.  You can set this to the following things:
+        #
+        # <code>Maildir</code> :: Create Maildir mailboxes.
+        #
+        #                         This sets +spooldir+ to your home
+        #                         directory, +spoolfile+ to
+        #                         $HOME/Maildir and creates 
+        #                         mail folders underneath that.
+        #
+        # <code>MH</code> :: Create MH mail boxes.
+        #
+        #                    This reads your <code>.mh_profile</code>
+        #                    file to find out where you've told MH to
+        #                    find its mail folders, and uses that value.
+        #                    If it can't find that in your .mh_profile,
+        #                    it will assume you want mailboxes in
+        #                    $HOME/Mail.  It sets +spoolfile+ to 
+        #                    "inbox" in your mail directory.
+        #
+        # <code>Mbox</code> :: Create +mbox+ mailboxes.
+        #
+        #                      This sets +spooldir+ to
+        #                      <code>/var/spool/mail</code> and
+        #                      +spoolfile+ to a file with your username
+        #                      in <code>/var/spool/mail</code>.
+        def folderstyle(*style) 
             if style.length == 0 then
                 @folderstyle
             elsif style.length == 1 then
@@ -141,7 +204,7 @@ module Gurgitate
             instance_eval(&block) if block_given?
         end
 
-        def add_rules(filename, options = {})
+        def add_rules(filename, options = {}) #:nodoc:
             if not Hash === options
                 raise ArgumentError.new("Expected hash of options")
             end
@@ -171,15 +234,16 @@ module Gurgitate
             end
         end
 
-        # Deletes the current message.
+        # Deletes (discards) the current message.
         def delete
             # Well, nothing here, really.
         end
 
-        # This is a neat one.  You can get any header as a method.
-        # Say, if you want the header "X-Face", then you call
-        # x_face and that gets it for you.  It raises NameError if
-        # that header isn't found.
+        # This is kind of neat.  You can get a header by calling its
+        # name as a method.  For example, if you want the header
+        # "X-Face", then you call x_face and that gets it for you.  It
+        # raises NameError if that header isn't found.
+        #
         # meth::
         #   The method that the caller tried to call which isn't
         #   handled any other way.
@@ -193,6 +257,7 @@ module Gurgitate
         end
 
         # Forwards the message to +address+.
+        #
         # address::
         #   A valid email address to forward the message to.
         def forward(address)
@@ -204,7 +269,7 @@ module Gurgitate
 
         # Writes +message+ to the log file.
         def log(message)
-            if(@logfile)then
+            if @logfile then
                 File.open(@logfile,"a") do |f|
                     f.flock(File::LOCK_EX)
                     f.print(Time.new.to_s+" "+message+"\n")
@@ -214,7 +279,7 @@ module Gurgitate
         end
 
         # Pipes the message through +program+.  If +program+
-        # fails, puts the message into +spoolfile+
+        # fails, it puts the message into +spoolfile+
         def pipe(program)
             self.log "Piping through "+program
             IO.popen(program,"w") do |f|
@@ -225,6 +290,17 @@ module Gurgitate
 
         # Pipes the message through +program+, and returns another
         # +Gurgitate+ object containing the output of the filter
+        #
+        # Use it like this:
+        #
+        #  filter "bogofilter -p" do
+        #    if x_bogosity =~ /Spam/ then
+        #      log "Found spam"
+        #      delete
+        #      return
+        #    end
+        #  end
+        #
         def filter(program,&block)
             self.log "Filtering with "+program
             IO.popen("-","w+") do |filter|
@@ -255,8 +331,7 @@ module Gurgitate
             end
         end
 
-        # Processes your .gurgitate-rules.rb.
-        def process(&block)
+        def process(&block) #:nodoc:
             begin
                 if @rules.size > 0 or block
                     @rules.each do |configfilespec|
