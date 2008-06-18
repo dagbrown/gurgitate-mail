@@ -2,7 +2,7 @@ NAME
     gurgitate-mail - an easy-to-use mail filter
 
 SYNOPSIS
-    gurgitate-mail
+    gurgitate-mail [-s SENDER] [-f RULESFILE] [-h]
 
 DESCRIPTION
     "gurgitate-mail" is a program which reads your mail and filters it
@@ -27,6 +27,19 @@ DESCRIPTION
     in /etc/postfix/main.cf. If you use any other MTA, and configure
     gurgitate-mail as a local delivery agent, please tell me how! I want to
     include this in the documentation.
+
+COMMAND LINE OPTIONS
+    gurgitate-mail lets you alter its default behaviour with some
+    command-line flags:
+
+    -s SENDER
+         Sets the envelope sender to SENDER.
+
+    -f RULESFILE
+         Uses RULESFILE as the source for gurgitate-rules rather than the
+         default /$HOME/.gurgitate-rules.
+
+    -h   Outputs a quick summary of the options available.
 
 CONFIGURATION FILES
     There are three configuration files used by gurgitate-mail: two are
