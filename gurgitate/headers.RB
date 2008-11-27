@@ -3,10 +3,6 @@
 require "gurgitate/header"
 
 module Gurgitate
-    class IllegalHeader < RuntimeError ; end
-
-# ========================================================================
-
     class HeaderBag < Array
         def =~(regex)
             inject(false) do |y,x|
@@ -36,7 +32,6 @@ module Gurgitate
                 member.to_s
             end.join ""
         end
-
     end
 
     # A slightly bigger class for all of a message's headers

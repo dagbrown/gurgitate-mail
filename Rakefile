@@ -17,8 +17,7 @@
 #       http://jimweirich.umlcoop.net/packages/rake/
 #========================================================================
 
-require 'fileutils'
-
+require 'ftools'
 begin
     require "rake/classic_namespace"
 rescue nil

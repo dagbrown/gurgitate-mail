@@ -68,9 +68,27 @@ module Gurgitate
     class Gurgitate < Mailmessage
         include Deliver
 
-        def self.attr_configparam(*syms) #:nodoc:
+        # Instead of the usual attributes, I went with a
+        # reader-is-writer type thing (as seen quite often in Perl and
+        # C++ code) so that in your .gurgitate-rules, you can say
+        # 
+        # maildir "#{homedir}/Mail"
+        # sendmail "/usr/sbin/sendmail"
+        # spoolfile "Maildir"
+        # spooldir homedir
+        #
+        # This is because of an oddity in Ruby where, even if an
+        # accessor exists in the current object, if you say:
+        #    name = value
+        # it'll always create a local variable.  Not quite what you
+        # want when you're trying to set a config parameter.  You have
+        # to say "self.name = value", which (I think) is ugly.
+        #
+        # In the interests of promoting harmony, of course, the previous
+        # syntax will continue to work.
+        def self.attr_configparam(*syms)
             syms.each do |sym|
-                class_eval %/
+                class_eval %{
                     def #{sym} (*vals)
                         if vals.length == 1
                             @#{sym} = vals[0]
@@ -87,7 +105,7 @@ module Gurgitate
                     # old-style accessors though.  Breaking people's
                     # .gurgitate-rules is a bad idea.
                     attr_writer :#{sym}
-                /
+                }
             end
         end
 
@@ -163,7 +181,6 @@ module Gurgitate
                     spooldir "/var/spool/mail"
                     spoolfile File.join(spooldir, @passwd.name)
                 end
-
                 @folderstyle = style[0]
             else
                 raise ArgumentError, "wrong number of arguments "+
