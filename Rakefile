@@ -132,7 +132,7 @@ task :cover => :default do
     system("rcov test/runtests.rb")
 end
 
-task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 
+task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html", :gem] do 
     File.install(File.join("..",Tarball),Webpage,0644)
     File.install(File.join("..",Gemfile), Webpage, 0644)
     File.install("CHANGELOG",Webpage+"/CHANGELOG.txt",0644)
