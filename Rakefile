@@ -120,7 +120,7 @@ end
 task :test => :default do
     require './test/runtests'
 
-    testcases = Dir[File.join("tests","test_*")].map do |file|
+    testcases = Dir[File.join("test","test_*")].map do |file|
         load file
         eval("TC_" + File.basename(file,".rb").sub(/^test_/,'').capitalize)
     end
