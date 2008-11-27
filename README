@@ -262,7 +262,7 @@ SIMPLE EXAMPLES
     it's there, saves the email in the "swearing" folder.
 
         if headers.matches(["To","Cc"],"mailing-list@example.com") then
-            pipe("|rcvstore +mailing-list")
+            pipe("rcvstore +mailing-list")
             return
         end
 
@@ -276,7 +276,7 @@ SIMPLE EXAMPLES
     idiom happens often enough that there's a shorthand for it:
 
         if to =~ /mailing-list@example.com/ then
-            pipe("|rcvstore +mailing-list")
+            pipe("rcvstore +mailing-list")
             return
         end
 
