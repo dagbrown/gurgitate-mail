@@ -1,25 +1,23 @@
-#!/opt/bin/ruby -w
-
-#------------------------------------------------------------------------
-# 
-#------------------------------------------------------------------------
-
 require 'test/unit'
 require 'test/unit/ui/console/testrunner'
 require 'stringio'
 
+builddir = File.join(File.dirname(__FILE__),"..")
+unless $:[0] == builddir
+    $:.unshift builddir
+end
+
 class TC_Headers < Test::Unit::TestCase
     def setup
-        require './gurgitate-mail'
+        $:.unshift File.dirname(__FILE__)
+        require "gurgitate/headers"
     end
 
     def test_single_header
         h=Gurgitate::Headers.new(<<'EOF'
-From fromline@example.com Sat Sep 27 12:20:25 PDT 2003
 From: fromheader@example.com
 EOF
         )
-        assert_equal("fromline@example.com",h.from)
         assert_equal(1,h["From"].length)
         assert_equal("From",h["From"][0].name)
         assert_equal("fromheader@example.com",h["From"][0].contents)
@@ -31,10 +29,11 @@ From fromline Sat Sep 27 12:20:25 PDT 2003
 From: fromheader@example.com
 EOF
         )
-        assert_equal("fromline",h.from)
+        assert_equal("fromline", h.from)
         assert_equal(1,h["From"].length)
         assert_equal("From",h["From"][0].name)
         assert_equal("fromheader@example.com",h["From"][0].contents)
+        assert_equal nil, h["To"]
     end
 
     def basic_header_test
@@ -50,7 +49,6 @@ EOF
         yield h
     end
 
-
     def test_changing_headers
         basic_header_test do |h|
             h["From"].sub! "fromheader", "changedheader"
@@ -59,14 +57,16 @@ EOF
         end
     end
 
+
     def test_altered_headers
         basic_header_test do |h|
             new_header = h["From"].sub "fromheader", "changedheader"
 
             assert Gurgitate::HeaderBag === new_header
             assert_equal("changedheader@example.com",
-                         new_header[0].contents)
-            assert_equal("fromheader@example.com",h["From"][0].contents)
+                         new_header[0].contents, "sub didn't change contents")
+            assert_equal("fromheader@example.com",h["From"][0].contents,
+                         "sub is changing in-place")
         end
     end
 
@@ -90,7 +90,7 @@ From  Sat Sep 27 12:20:25 PDT 2003
 From: fromheader@example.com
 EOF
         )
-        assert_equal("",h.from)
+        assert_equal("", h.from)
         assert_equal(1,h["From"].length)
         assert_equal("From",h["From"][0].name)
         assert_equal("fromheader@example.com",h["From"][0].contents)
@@ -101,7 +101,6 @@ EOF
 From: fromheader@example.com
 EOF
         )
-        assert_equal('fromheader@example.com',h.from)
         assert_equal(1,h["From"].length)
         assert_equal("From",h["From"][0].name)
         assert_equal("fromheader@example.com",h["From"][0].contents)
@@ -111,12 +110,12 @@ EOF
         h = Gurgitate::Headers.new(<<'EOF', "sender@example.com", "recipient@example.com")
 From: fromheader@example.com
 To: toheader@example.com
-Subject: Subject
+Subject: Subject line
 EOF
         assert_equal('sender@example.com', h.from)
         assert_equal('recipient@example.com', h.to)
     end
-                                   
+
     def standard_headers_tests h
         assert_equal(1,h["From"].length)
         assert_equal("From",h["From"][0].name)
@@ -129,15 +128,14 @@ EOF
         assert_equal("Subject line",h["Subject"][0].contents)
     end
 
-    def test_multiple_headers
+    def multiple_headers_test
         h=Gurgitate::Headers.new(<<'EOF'
-From fromline@example.com Sat Sep 27 12:20:25 PDT 2003
 From: fromheader@example.com
 To: toheader@example.com
 Subject: Subject line
 EOF
         )
-        assert_equal(h.from,"fromline@example.com")
+        assert_equal('fromheader@example.com',h.from)
         standard_headers_tests h
     end
 
@@ -174,6 +172,7 @@ Subject: Subject line
 EOF
         )
         multiline_default_tests h
+
         assert_equal("toheader@example.com,\n    nexttoheader@example.com",h["To"][0].contents)
     end
 
@@ -187,6 +186,7 @@ Subject: Subject line
 EOF
         )
         multiline_default_tests h
+
         assert_equal("toheader@example.com,\n    nexttoheader@example.com (The test: header)",h["To"][0].contents)
     end
 
@@ -275,7 +275,7 @@ List-Help: <mailto:nifty-request@mail.neurotica.com?subject=help>
 List-Id: Nifty  <nifty.mail.neurotica.com>
 Original-recipient: rfc822;dagbrown@shaw.ca
 EOF
-        )
+)
         assert_equal(h.from,"nifty-bounces@neurotica.com")
         assert_equal(1,h["From"].length)
         assert_equal("From",h["From"][0].name)
@@ -302,7 +302,7 @@ EOF
         assert_equal("IAP password",h["Subject"][0].contents)
     end
 
-    def test_fromline_no_hostname # illegal from line
+    def test_fromheader_no_hostname # illegal from header?
         m=<<'EOF'
 From HEYITBLEWUP Sat Mar 27 16:02:12 PST 2004
 Received: from ohno.mrbill.net (ohno.mrbill.net [207.200.6.75])
@@ -325,15 +325,14 @@ EOF
         assert_equal(1,h["From"].length)
     end
 
-    def editing_template 
-    m = <<'EOF'
+    def editing_template
+        m = <<'EOF'
 From fromline@example.com Sat Oct 25 12:58:31 PDT 2003
 From: fromline@example.com
 To: toline@example.com
 Subject: Subject line
 EOF
-    return m.clone
-
+        return m.clone
     end
 
     def test_editing_header
@@ -369,7 +368,7 @@ EOF
             "headers contains toline")
         assert_equal(false,h["From","To"] =~ /nonexistent@example.com/,
             "headers do not contain nonexistent value")
-        assert_equal(false,h["Rabbit"] =~ /nonexistent/,
+        assert(!(h["Rabbit"] =~ /nonexistent/),
             "Asking for a nonexistent header")
     end
 
@@ -404,7 +403,7 @@ EOF
 
         assert_equal(false,h["To"] =~ /\blunar@lunar-linux.org\b/i,
             "There should be no Lunar Linux mailing list in To line")
-        assert_equal(false,h["Cc"] =~ /\blunar@lunar-linux.org\b/i,
+        assert(!(h["Cc"] =~ /\blunar@lunar-linux.org\b/i),
             "There should be no Lunar Linux mailing list in Cc line")
     end
 end
@@ -457,4 +456,5 @@ EOF
         assert !result
     end
 end
+
 
