@@ -17,7 +17,7 @@ module Gurgitate
     # based system.  It's almost like an attribute, only if you give the
     # accessor a parameter, it will set the configuration parameter to
     # the parameter's value.  For instance:
-    # 
+    #
     #  maildir "#{homedir}/Mail"
     #  sendmail "/usr/sbin/sendmail"
     #  spoolfile "Maildir"
@@ -30,7 +30,7 @@ module Gurgitate
     # want when you're trying to set a config parameter.  You have
     # to say <code>self.name = value</code>, which [I think] is ugly.
     #
-    # In the interests of promoting harmony, of course, 
+    # In the interests of promoting harmony, of course,
     # <code>self.name = value</code> still works.)
     #
     # The attributes you can define are:
@@ -61,10 +61,9 @@ module Gurgitate
     # spooldir :: The location where users' system mail boxes live.
     #
     # folderstyle :: The style of mailbox to create (and to expect,
-    #                although gurgitate-mail automatically detects the 
+    #                although gurgitate-mail automatically detects the
     #                type of existing mailboxes).  See the separate
     #                documentation for folderstyle for more details.
-    
     class Gurgitate < Mailmessage
         include Deliver
 
@@ -131,7 +130,7 @@ module Gurgitate
         # attr_configparam :folderstyle
 
         # What kind of mailboxes you prefer.  Treat this like a
-        # configuration parameter.  If no argument is given, then 
+        # configuration parameter.  If no argument is given, then
         # return the current default type.
         #
         # Depending on what you set this to, some other configuration
@@ -141,7 +140,7 @@ module Gurgitate
         #
         #                         This sets +spooldir+ to your home
         #                         directory, +spoolfile+ to
-        #                         $HOME/Maildir and creates 
+        #                         $HOME/Maildir and creates
         #                         mail folders underneath that.
         #
         # <code>MH</code> :: Create MH mail boxes.
@@ -151,7 +150,7 @@ module Gurgitate
         #                    find its mail folders, and uses that value.
         #                    If it can't find that in your .mh_profile,
         #                    it will assume you want mailboxes in
-        #                    $HOME/Mail.  It sets +spoolfile+ to 
+        #                    $HOME/Mail.  It sets +spoolfile+ to
         #                    "inbox" in your mail directory.
         #
         # <code>Mbox</code> :: Create +mbox+ mailboxes.
@@ -160,7 +159,7 @@ module Gurgitate
         #                      <code>/var/spool/mail</code> and
         #                      +spoolfile+ to a file with your username
         #                      in <code>/var/spool/mail</code>.
-        def folderstyle(*style) 
+        def folderstyle(*style)
             if style.length == 0 then
                 @folderstyle
             elsif style.length == 1 then
@@ -181,6 +180,7 @@ module Gurgitate
                     spooldir "/var/spool/mail"
                     spoolfile File.join(spooldir, @passwd.name)
                 end
+
                 @folderstyle = style[0]
             else
                 raise ArgumentError, "wrong number of arguments "+
@@ -296,7 +296,7 @@ module Gurgitate
         end
 
         # Pipes the message through +program+.  If +program+
-        # fails, it puts the message into +spoolfile+
+        # fails, puts the message into +spoolfile+
         def pipe(program)
             self.log "Piping through "+program
             IO.popen(program,"w") do |f|
