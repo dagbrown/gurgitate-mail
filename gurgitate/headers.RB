@@ -3,6 +3,10 @@
 require "gurgitate/header"
 
 module Gurgitate
+    class IllegalHeader < RuntimeError ; end
+
+# ========================================================================
+
     class HeaderBag < Array
         def =~(regex)
             inject(false) do |y,x|
@@ -18,7 +22,7 @@ module Gurgitate
         
         def sub(regex, replacement)
             ::Gurgitate::HeaderBag.new(
-                self.map do |header|
+                clone.map do |header|
                     ::Gurgitate::Header.new(
                         "#{header.name}: " + header.contents.sub(regex, 
                                                                  replacement)
@@ -32,6 +36,7 @@ module Gurgitate
                 member.to_s
             end.join ""
         end
+
     end
 
     # A slightly bigger class for all of a message's headers
@@ -42,7 +47,7 @@ module Gurgitate
         # Figures out whether the first line of a mail message is an
         # mbox-style "From " line (say, if you get this from sendmail),
         # or whether it's just a normal header.
-        # -- 
+        # --
         # If you run "fetchmail" with the -m option to feed the
         # mail message straight to gurgitate, skipping the "local
         # MTA" step, then it doesn't have a "From " line.  So I
@@ -116,7 +121,8 @@ module Gurgitate
                     @from=$+
                 end
             else
-                fromregex=/([^ ]+@[^ ]+) \(.*\)|[^<]*[<](.*@.*)[>]|([^ ]+@[^ ]+)/
+                fromregex=/([^ ]+@[^ ]+) \(.*\)|[^<]*[<](.*@.*)[>]|([^ ]+@[^ ]+
+)/
                 if self["Return-Path"] != nil then
                     fromregex.match(self["Return-Path"][0].contents)
                 else
@@ -130,12 +136,14 @@ module Gurgitate
                 # assume that it's local mail, and doesn't have an @ in its
                 # address.
                 unless address_candidate
-                    if self["Return-Path"] != nil then
+                    if self["Return-Path"] then
                         self["Return-Path"][0].contents =~ /(\S+)/
                         address_candidate=$+
                     else
-                        self["From"][0].contents =~ /(\S+)/
-                        address_candidate=$+
+                        if self["From"] then
+                            self["From"][0].contents =~ /(\S+)/
+                                address_candidate=$+
+                        end
                     end
                 end
 
@@ -217,7 +225,7 @@ module Gurgitate
         # Change the envelope from line to whatever you want.  This might
         # not be particularly neighborly, but oh well.
         # newfrom:: An email address
-        def from=(newfrom) 
+        def from=(newfrom)
             @from=newfrom
             @unix_from="From "+self.from+" "+Time.new.to_s
         end
