@@ -8,7 +8,7 @@ unless $:[0] == builddir
     $:.unshift builddir
 end
 
-require 'gurgitate/mailheaders'
+require 'gurgitate/mail_headers'
 
 class TC_Mail_headers_meddling_with_headers < Test::Unit::TestCase
     def setup
