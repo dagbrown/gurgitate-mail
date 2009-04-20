@@ -262,4 +262,28 @@ class TC_Gurgitate_delivery < GurgitateTest
 
         ensure_maildir_with_n_messages(File.join(@folders, "test"), 1)
     end
+
+    def test_message_parsed_correctly
+        assert_equal("From: me",@gurgitate.header("From"))
+        assert_equal("To: you", @gurgitate.header("To"))
+        assert_equal("Subject: test", @gurgitate.header("Subject"))
+        assert_equal("Hi.\n", @gurgitate.body, "Message body is wrong")
+    end
+
+    def test_message_written_correctly
+        test_message_parsed_correctly
+        assert_nothing_raised do
+            @gurgitate.process
+        end
+
+        mess=nil
+        assert_nothing_raised do
+            mess = Gurgitate::Mailmessage.new(File.read(@spoolfile))
+        end
+
+        assert_equal("From: me", mess.header("From"), "From header is wrong")
+        assert_equal("To: you", mess.header("To"), "To header is wrong")
+        assert_equal("Hi.\n", mess.body, "Body is wrong")
+        assert_equal("Subject: test", mess.header("Subject"), "Subject header wrong")
+    end
 end
