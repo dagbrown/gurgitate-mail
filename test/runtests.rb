@@ -1,16 +1,15 @@
-#------------------------------------------------------------------------
-# Unit tests for gurgitate-mail
-#------------------------------------------------------------------------
-
 require 'test/unit'
 require 'test/unit/ui/console/testrunner'
 require 'stringio'
 require 'pathname'
 
-builddir = File.join(File.dirname(__FILE__),"..")
+builddir = File.dirname(File.dirname(__FILE__))
+
 unless $:[0] == builddir
     $:.unshift builddir
 end
+
+require "test/gurgitate-test"
 
 def runtests(testcases)
     testcases.each do |testcase|

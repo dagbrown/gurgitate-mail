@@ -1,4 +1,5 @@
 builddir = File.join(File.dirname(__FILE__),"..")
+
 unless $:[0] == builddir
     $:.unshift builddir
 end

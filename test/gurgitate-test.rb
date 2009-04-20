@@ -1,11 +1,17 @@
+builddir = File.dirname(File.dirname(__FILE__))
+
+unless $:[0] == builddir
+    $:.unshift builddir
+end
+
 require 'test/unit'
 require 'test/unit/ui/console/testrunner'
 require 'stringio'
 require 'fileutils'
 require 'pathname'
 require 'irb'
-$:.unshift File.dirname(__FILE__) + "/.."
 require "gurgitate-mail"
+require "etc"
 
 class GurgitateTest < Test::Unit::TestCase
 	def setup

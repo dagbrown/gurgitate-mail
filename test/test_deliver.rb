@@ -1,3 +1,9 @@
+builddir = File.dirname(File.dirname(__FILE__))
+
+unless $:[0] == builddir
+    $:.unshift builddir
+end
+
 require 'test/unit'
 require 'test/unit/ui/console/testrunner'
 require 'stringio'

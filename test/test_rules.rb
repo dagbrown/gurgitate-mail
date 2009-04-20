@@ -1,3 +1,11 @@
+builddir = File.join(File.dirname(__FILE__),"..")
+
+puts builddir
+
+unless $:[0] == builddir
+    $:.unshift builddir
+end
+
 require "test/gurgitate-test"
 require "etc"
 
@@ -99,7 +107,7 @@ class TC_ExecuteRules < TC_Rules
     def test_process_rules_not_found
         @gurgitate.add_rules @rulesfile
         File.unlink @rulesfile
-        assert_nothing_raised do 
+        assert_nothing_raised do
             @gurgitate.process
         end
         assert File.exists?(@spoolfile)
