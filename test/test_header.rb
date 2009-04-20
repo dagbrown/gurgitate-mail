@@ -1,9 +1,3 @@
-#!/opt/bin/ruby -w
-
-#------------------------------------------------------------------------
-# 
-#------------------------------------------------------------------------
-
 builddir = File.join(File.dirname(__FILE__),"..")
 unless $:[0] == builddir
     $:.unshift builddir
@@ -14,7 +8,6 @@ require 'test/unit/ui/console/testrunner'
 require 'stringio'
 
 class TC_Header < Test::Unit::TestCase
-
     def setup
         require 'gurgitate-mail'
     end
@@ -43,6 +36,17 @@ class TC_Header < Test::Unit::TestCase
         end
     end
 
+    def test_illegal_header
+        assert_raises Gurgitate::IllegalHeader do
+            h=Gurgitate::Header.new("not actually a header")
+        end
+    end
+
+    def test_header_name_and_values_separate
+        h=Gurgitate::Header.new("From", "test@example.com")
+        assert_equal h.name, "From", "Preparsed header is not From"
+        assert_equal h.contents, "test@example.com", "Preparsed header has wrong contents"
+    end
 
     # This is an illegal header that turns up in spam sometimes.
     # Crashing when you get spam is bad.
@@ -151,6 +155,13 @@ class TC_Header < Test::Unit::TestCase
         h=Gurgitate::Header.new("From: fromheader@example.com")
         assert_equal(0,h.matches(/fromheader/),"Matches regex that would match input")
         assert_equal(nil,h.matches(/notininput/),"Does not match regex that would not match input")
+    end
+
+    def test_string_match
+        h=Gurgitate::Header.new("From: fromheader@example.com")
+        assert_equal 0, h.matches("fromheader"), "doesn't match string properly"
+        assert_equal nil, h.matches("notininput"), 
+            "matches something it shouldn't"
     end
 end
 
