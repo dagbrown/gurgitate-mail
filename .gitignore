@@ -1,0 +1,16 @@
+gurgitate-mail
+gurgitate-mail.html
+gurgitate-mail.man
+gurgitate-mail.rb
+gurgitate-mail.text
+gurgitate/deliver.rb
+gurgitate/deliver/maildir.rb
+gurgitate/deliver/mbox.rb
+gurgitate/deliver/mh.rb
+gurgitate/header.rb
+gurgitate/headers.rb
+gurgitate/mail_headers.rb
+gurgitate/mailmessage.rb
+gurgitate/message.rb
+pod2htmd.tmp
+pod2htmi.tmp
