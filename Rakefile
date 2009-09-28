@@ -17,7 +17,8 @@
 #       http://jimweirich.umlcoop.net/packages/rake/
 #========================================================================
 
-require 'ftools'
+require 'fileutils'
+
 begin
     require "rake/classic_namespace"
 rescue nil
@@ -27,6 +28,8 @@ Package = "gurgitate-mail"
 
 Modules =  %w{gurgitate/deliver.rb
              gurgitate/headers.rb 
+             gurgitate/mail_headers.rb
+             gurgitate/message.rb
              gurgitate/header.rb 
              gurgitate/mailmessage.rb
              gurgitate/deliver/maildir.rb
@@ -39,7 +42,7 @@ Targets = %w{gurgitate-mail.rb
              gurgitate-mail.man
              README} + Modules
 
-Tests = Dir["test/*.rb"]
+Tests = Dir["test/test_*.rb"]
 
 Gemspec = "#{Package}.gemspec"
 
@@ -63,7 +66,7 @@ end
 
 task :clean => :gem_cleanup do
     delete_all(*Targets+["pod2htm*~~","*.tmp",
-        "gurgitate-mail.text","doc","*~"]-["README"]) 
+        "gurgitate-mail.text","doc","*~"]) 
 end
 
 task :gem_cleanup do
@@ -118,9 +121,10 @@ task :doc => "gurgitate-mail.rb" do |task|
 end
 
 task :test => :default do
+    $:.unshift File.dirname(__FILE__)
     require './test/runtests'
 
-    testcases = Dir[File.join("test","test_*")].map do |file|
+    testcases = Tests.map do |file|
         load file
         eval("TC_" + File.basename(file,".rb").sub(/^test_/,'').capitalize)
     end
@@ -132,7 +136,7 @@ task :cover => :default do
     system("rcov test/runtests.rb")
 end
 
-task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html", :gem] do 
+task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 
     File.install(File.join("..",Tarball),Webpage,0644)
     File.install(File.join("..",Gemfile), Webpage, 0644)
     File.install("CHANGELOG",Webpage+"/CHANGELOG.txt",0644)
