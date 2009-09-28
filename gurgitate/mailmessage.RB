@@ -104,7 +104,19 @@ module Gurgitate
         def from; @sender || @headers.from; end
 
         # Returns all the candidates for a recipient
-        def to; @recipient || @headers["To", "Cc"][0].contents; end
+        def to
+            if @recipient
+                then @recipient
+            elsif @headers["To"]
+                then @headers["To"][0].contents
+            elsif @headers["Cc"]
+                then @headers["Cc"][0].contents
+            elsif @headers["X-Original-To"]
+                then @headers["X-Original-To"][0].contents
+            else
+                ""
+            end
+        end
 
         # Returns the mail message formatted for mbox
         def to_mbox; @headers.to_mbox + "\n\n" + @body; end
