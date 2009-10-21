@@ -137,10 +137,10 @@ task :cover => :default do
 end
 
 task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 
-    FileUtils.install(File.join("..",Tarball),Webpage,0644)
-    FileUtils.install(File.join("..",Gemfile), Webpage, 0644)
-    FileUtils.install("CHANGELOG",Webpage+"/CHANGELOG.txt",0644)
-    FileUtils.install("gurgitate-mail.html",Webpage,0644)
+    FileUtils.install(File.join("..",Tarball),Webpage,:mode => 0644)
+    FileUtils.install(File.join("..",Gemfile), Webpage, :mode => 0644)
+    FileUtils.install("CHANGELOG",Webpage+"/CHANGELOG.txt", :mode => 0644)
+    FileUtils.install("gurgitate-mail.html",Webpage, :mode => 0644)
 end
 
 # Should be ruby_"compile" but I can't put quote marks in method names :-)
