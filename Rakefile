@@ -60,7 +60,7 @@ task :release => [:tag, :dist, :webpage]
 task :rerelease => [:untag, :tag, :tarball, :webpage]
 
 task :gem => Gemfile do
-    File.move Gemfile, ".."
+    FileUtils.mv Gemfile, ".."
 end
 
 
