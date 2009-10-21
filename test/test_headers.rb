@@ -302,6 +302,54 @@ EOF
         assert_equal("IAP password",h["Subject"][0].contents)
     end
 
+    def test_yet_another_crashy_set_of_headers
+        h = nil
+        assert_nothing_raised do 
+            h = Gurgitate::Headers.new(<<'EOF')
+Return-Path: <chailatte@detroit.blackbox.com>
+X-Original-To: ML01547@gmo.jp
+Delivered-To: ML01547@gmo.jp
+Received: from localhost (localhost [127.0.0.1])
+        by mx.gmo.jp (Postfix) with ESMTP id 0469888958;
+        Tue, 27 May 2008 13:11:15 +0900 (JST)
+X-Quarantine-ID: <T9cVuddV5I5W>
+X-Virus-Scanned: amavisd-new at gmo.jp
+X-Amavis-Alert: BAD HEADER, Non-encoded 8-bit data (char 82 hex): Subject:
+        \202\307\202\247\202\274\201I\201I\n
+X-Spam-Flag: YES
+X-Spam-Score: 15.944
+X-Spam-Level: ***************
+X-Spam-Status: Yes, score=15.944 tagged_above=2 required=6.31
+        tests=[ALL_TRUSTED=-1.44, NO_REAL_NAME=0.55, SUBJ_ILLEGAL_CHARS=3.36,
+        UPPERCASE_50_75=0.591, URIBL_AB_SURBL=3.306, URIBL_JP_SURBL=3.36,
+        URIBL_OB_SURBL=2.617, URIBL_SC_SURBL=3.6]
+Received: from mx.gmo.jp ([127.0.0.1])
+        by localhost (corpmx02.gmo.jp [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id T9cVuddV5I5W; Tue, 27 May 2008 13:11:06 +0900 (JST)
+Received: from pc-28-60-241-201.cm.vtr.net (pc-28-60-241-201.cm.vtr.net [201.241.60.28])
+        by mx.gmo.jp (Postfix) with SMTP id BB6C98883A
+        for <admin@zero-isp.net>; Tue, 27 May 2008 13:11:03 +0900 (JST)
+From:<chailatte@detroit.blackbox.com>
+To: admin@zero-isp.net
+Subject: ***SPAM*** =?iso-8859-1?Q?=82=C7=82=A7=82=BC=81I=81I?=
+Date: Tue, 27 May 2008 13:11:03 +0900
+X-Info:admin@zero-isp.net
+MIME-Version: 1.0
+X-Antivirus: avast! (VPS 080527-0, 27/05/2008), Outbound message
+X-Antivirus-Status: Clean
+Message-Id: <20080527041104.BB6C98883A@mx.gmo.jp>
+EOF
+        end
+
+        assert_equal("chailatte@detroit.blackbox.com", h.from)
+        assert_nothing_raised do
+            h["From"][0]
+        end
+
+        assert_equal("<chailatte@detroit.blackbox.com>", h["From"][0].contents)
+    end
+
+
     def test_fromheader_no_hostname # illegal from header?
         m=<<'EOF'
 From HEYITBLEWUP Sat Mar 27 16:02:12 PST 2004

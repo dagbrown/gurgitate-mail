@@ -33,7 +33,7 @@ module Gurgitate
                 # some more (printable, but can include whitespaces)
                 # crap.
                 if(header[0] =~ /^[\x21-\x39\x3b-\x7e]+:/) then
-                    (name,contents)=header[0].split(/:\s+/,2)
+                    (name,contents)=header[0].split(/:\s*/,2)
                     if(name =~ /:$/ and contents == nil) then
                         # It looks like someone is using Becky!
                         name=header[0].gsub(/:$/,"")
