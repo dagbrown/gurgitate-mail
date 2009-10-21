@@ -102,15 +102,15 @@ file Tarball => Releasefiles do |t|
 end
 
 task :tag => "VERSION" do
-    run("cvs update VERSION")
+    run("git checkout -f VERSION")
     tag="RELEASE_"+File.open("VERSION").read.chomp.gsub(/\./,"_")
-    run("cvs tag #{tag}")
+    run("git tag #{tag}")
 end
 
 task :untag => "VERSION" do
-    run("cvs update VERSION")
+    run("git checkout -f VERSION")
     tag="RELEASE_"+File.open("VERSION").read.chomp.gsub(/\./,"_")
-    run("cvs tag -d #{tag}")
+    run("git tag -d #{tag}")
 end
 
 task :doc => "gurgitate-mail.rb" do |task|
@@ -137,10 +137,10 @@ task :cover => :default do
 end
 
 task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 
-    File.install(File.join("..",Tarball),Webpage,0644)
-    File.install(File.join("..",Gemfile), Webpage, 0644)
-    File.install("CHANGELOG",Webpage+"/CHANGELOG.txt",0644)
-    File.install("gurgitate-mail.html",Webpage,0644)
+    FileUtils.install(File.join("..",Tarball),Webpage,0644)
+    FileUtils.install(File.join("..",Gemfile), Webpage, 0644)
+    FileUtils.install("CHANGELOG",Webpage+"/CHANGELOG.txt",0644)
+    FileUtils.install("gurgitate-mail.html",Webpage,0644)
 end
 
 # Should be ruby_"compile" but I can't put quote marks in method names :-)
