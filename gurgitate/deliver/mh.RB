@@ -62,7 +62,8 @@ module Gurgitate
             def update_sequences mailbox, msgnum
                 sequences = File.join(mailbox, ".mh_sequences")
                 lockfile = sequences + ".lock" # how quaint
-                loop do
+                counter=0
+                while counter < 10 do
                     begin
                         File.open(lockfile,
                                   File::WRONLY |
@@ -86,13 +87,22 @@ module Gurgitate
                             end
                         end
 
-                        File.unlink(lockfile)
+                        File.unlink lockfile
                         break
                     rescue Errno::EEXIST
                         # some other process is doing something, so wait a few
                         # milliseconds until it's done
-                        sleep(0.01)
+                        counter += 1
+                        sleep(0.1)
                     end
+                end
+
+                # If it's still around after 10 tries, then obviously 
+                # something bigger went wrong; forcibly remove it and
+                # try again.
+                if counter == 10 then
+                    File.unlink lockfile
+                    update_sequences mailbox, msgnum
                 end
             end
 
