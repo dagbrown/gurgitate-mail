@@ -1,3 +1,15 @@
+1.10.3:
+
+- Fix for hanging-on-locked-mh-sequences bug
+
+1.10.2:
+
+- Bug fix to fix more crashes on not-quite-well-formed mail
+
+1.10.1:
+
+- Bug fix to fix crashes on not-quite-well-formed mail
+
 1.10.0:
 
 - Added support for MH mailboxes
