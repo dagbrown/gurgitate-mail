@@ -12,12 +12,14 @@ require 'pathname'
 require 'irb'
 require "gurgitate-mail"
 require "etc"
+require "tmpdir"
 
 class GurgitateTest < Test::Unit::TestCase
 	def setup
         currentdir = Pathname.new(File.join(File.dirname(__FILE__), 
                                          "..")).realpath.to_s
-        @testdir = File.join(currentdir,"test-data")
+        @testdir = Dir.mktmpdir
+        # @testdir = File.join(currentdir,"test-data")
         @folders = File.join(@testdir,"folders")
         FileUtils.rmtree @testdir if File.exists? @testdir
         Dir.mkdir @testdir
