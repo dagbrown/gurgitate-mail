@@ -1,0 +1,15 @@
+Tests = Dir["test/test_*.rb"]
+
+
+task :test do
+    $:.unshift File.dirname(__FILE__)
+    require './test/runtests'
+
+    testcases = Tests.map do |file|
+        load file
+        eval("TC_" + File.basename(file,".rb").sub(/^test_/,'').capitalize)
+    end
+
+    runtests testcases
+end
+
