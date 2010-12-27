@@ -23,7 +23,6 @@ spec = Gem::Specification.new do |s|
 
     # Load-time details: library and application
     s.require_path = 'lib'                 # Use these for libraries.
-    s.autorequire = 'gurgitate-mail'
 
     s.bindir = "bin"                       # Use these for applications.
     s.executables = ["gurgitate-mail"]
@@ -31,5 +30,5 @@ spec = Gem::Specification.new do |s|
 
     # Documentation and testing.
     s.has_rdoc = true
-    s.test_suite_file = "test/runtests.rb"
+    s.test_files = Dir["test/*.rb"]
 end
