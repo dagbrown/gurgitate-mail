@@ -29,6 +29,9 @@ module Gurgitate
             include Config
 
             if prefix then
+                if not File.exists? prefix then
+                    Dir.mkdir prefix
+                end
                 bindir = File.join prefix, "bin"; mkdir bindir
                 dest   = File.join prefix, "lib"; mkdir dest
                 mkdir File.join(prefix, "man")
