@@ -190,20 +190,7 @@ end
 
 def delete_all(*wildcards)
     wildcards.each do |wildcard|
-        Dir[wildcard].each do |fn|
-            next if ! File.exist?(fn)
-            if File.directory?(fn)
-                Dir["#{fn}/*"].each do |subfn|
-                    next if subfn=='.' || subfn=='..'
-                    delete_all(subfn)
-                end
-                puts "Deleting directory #{fn}"
-                Dir.delete(fn)
-            else
-                puts "Deleting file #{fn}"
-                File.delete(fn)
-            end
-        end
+        FileUtils.rm_rf wildcard
     end
 end
 
