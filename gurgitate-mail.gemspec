@@ -19,6 +19,7 @@ spec = Gem::Specification.new do |s|
 
     s.files = Dir.glob("lib/**/*.rb").delete_if { |item| item.include?"CVS" }
     s.files += Dir.glob("test/**/*.rb").delete_if { |item| item.include? "CVS" }
+    s.files += [ ".gemtest", "Rakefile" ]
 
     # Load-time details: library and application
     s.require_path = 'lib'                 # Use these for libraries.

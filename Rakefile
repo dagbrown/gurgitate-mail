@@ -18,6 +18,7 @@
 #========================================================================
 
 require 'fileutils'
+require 'rubygems'
 
 begin
     require "rake/classic_namespace"
@@ -42,7 +43,7 @@ Targets = %w{gurgitate-mail.rb
              gurgitate-mail.man
              README} + Modules
 
-Tests = Dir["test/test_*.rb"]
+Tests = Dir["test/test_*.rb", ".gemtest", "Rakefile"]
 
 Gemspec = "#{Package}.gemspec"
 
