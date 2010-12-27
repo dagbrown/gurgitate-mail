@@ -33,12 +33,14 @@ module Gurgitate
                 dest   = File.join prefix, "lib"; mkdir dest
                 mkdir File.join(prefix, "man")
                 mandir = File.join prefix, "man", "man1"; mkdir mandir
+                test   = File.join(prefix,"test")
             else
                 version = CONFIG["MAJOR"] + "." + CONFIG["MINOR"]
                 sitedir = CONFIG["sitedir"]
                 bindir  = CONFIG["bindir"]
                 mandir  = File.join(CONFIG["mandir"],"man1")
                 dest    = CONFIG["sitelibdir"]
+                test    = nil
             end
 
             destgur = File.join(dest,"gurgitate")
@@ -60,6 +62,17 @@ module Gurgitate
                 puts "Installing #{f} in #{destdel}..."
                 FileUtils.install(f,destdel)
             }
+
+            if test then
+                mkdir test
+
+                Dir[File.join("test","*.rb")].each do |f|
+                    puts "Installing #{f} in #{test}"
+                    FileUtils.install(f, test)
+                end
+
+                FileUtils.install "Rakefile.test", File.join(prefix, "Rakefile")
+            end
 
             print "Installing #{Package}.1 in #{mandir}...\n"
             FileUtils.install("#{Package}.man","#{mandir}/#{Package}.1", 

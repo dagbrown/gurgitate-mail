@@ -25,6 +25,8 @@ begin
 rescue nil
 end
 
+BuildDir = "BUILD"
+
 Package = "gurgitate-mail"
 
 Modules =  %w{gurgitate/deliver.rb
@@ -43,7 +45,7 @@ Targets = %w{gurgitate-mail.rb
              gurgitate-mail.man
              README} + Modules
 
-Tests = Dir["test/test_*.rb", ".gemtest", "Rakefile"]
+Tests = Dir["test/test_*.rb"]
 
 Gemspec = "#{Package}.gemspec"
 
@@ -60,10 +62,7 @@ task :tarball => Tarball
 task :release => [:tag, :dist, :webpage]
 task :rerelease => [:untag, :tag, :tarball, :webpage]
 
-task :gem => Gemfile do
-    FileUtils.mv Gemfile, ".."
-end
-
+task :gem => Gemfile
 
 task :clean => :gem_cleanup do
     delete_all(*Targets+["pod2htm*~~","*.tmp",
@@ -71,21 +70,24 @@ task :clean => :gem_cleanup do
 end
 
 task :gem_cleanup do
-    delete_all "bin"
-    delete_all "lib"
-    delete_all "man"
+    delete_all BuildDir
     delete_all "*.gem"
 end
 
 file Gemfile => [ Gemspec, :gem_install ] do
     require "rubygems/builder"
     gemspec = eval File.read(Gemspec)
+    FileUtils.touch File.join(BuildDir, ".gemtest")
+    olddir = Dir.pwd
+    chdir BuildDir
     Gem::Builder.new(gemspec).build
+    FileUtils.mv Gemfile,olddir
+    chdir olddir
 end
 
 task :gem_install => Targets do
     require "install"
-    Gurgitate::Install.install "."
+    Gurgitate::Install.install BuildDir
 end
 
 task :install => Targets do
@@ -134,7 +136,7 @@ task :test => :default do
 end
 
 task :cover => :default do
-    system("rcov test/runtests.rb")
+    system("rcov #{BuildDir}/test/runtests.rb")
 end
 
 task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 
