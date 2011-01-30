@@ -1,12 +1,7 @@
+require 'rubygems'
+gem 'test-unit'
 require 'test/unit'
-tester = nil
-begin
-    require 'test/unit/ui/console/testrunner'
-    tester = Test::Unit::UI::Console::TestRunner
-rescue LoadError  # ruby 1.9
-    require 'test/unit'
-    tester = Test::Unit
-end
+require 'test/unit/ui/console/testrunner'
 require 'stringio'
 require 'pathname'
 
