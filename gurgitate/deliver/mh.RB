@@ -24,10 +24,10 @@ module Gurgitate
                     # I could put in a check for the path given in
                     # $HOME/.mh_profile, but Claws-Mail uses MH mailboxes and
                     # disregards $HOME/.mh_profile.
-                    if File.stat(mailbox).directory? and
+                    if( File.stat(mailbox).directory? and
                         not ( File.exists?(File.join(mailbox, "cur")) or
                               File.exists?(File.join(mailbox, "tmp")) or
-                              File.exists?(File.join(mailbox, "new"))) then
+                              File.exists?(File.join(mailbox, "new")) ) ) then
                         return MH
                     end
                 rescue Errno::ENOENT

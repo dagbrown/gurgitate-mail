@@ -26,7 +26,7 @@ module Gurgitate
         end
 
         def self.install(prefix=nil)
-            include Config
+            include RbConfig
 
             if prefix then
                 if not File.exists? prefix then

@@ -361,7 +361,7 @@ module Gurgitate
                         rescue Exception
                             log "Error while executing #{configfilespec}: #{$!}"
                             $@.each { |tr| log "Backtrace: #{tr}" }
-                            folderstyle = MBox
+                            folderstyle MBox
                             save(spoolfile)
                         end
                     end
@@ -377,7 +377,7 @@ module Gurgitate
                 log "Error while executing rules: #{$!}"
                 $@.each { |tr| log "Backtrace: #{tr}" }
                 log "Attempting to save to spoolfile after error"
-                folderstyle = MBox
+                folderstyle MBox
                 save(spoolfile)
             end
         end

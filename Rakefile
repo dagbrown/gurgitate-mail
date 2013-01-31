@@ -86,12 +86,12 @@ file Gemfile => [ Gemspec, :gem_install ] do
 end
 
 task :gem_install => Targets do
-    require "install"
+    load "install.rb"
     Gurgitate::Install.install BuildDir
 end
 
 task :install => Targets do
-    require "install"
+    load "install.rb"
     Gurgitate::Install.install
 end
 
