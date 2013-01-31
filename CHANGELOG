@@ -1,3 +1,7 @@
+1.10.6:
+
+- Took care of a bunch of warnings from Ruby 1.9.3.
+
 1.10.5:
 
 - Added support for rubygem-testers, which involved a bit of a refactor
