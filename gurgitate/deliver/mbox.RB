@@ -41,7 +41,7 @@ module Gurgitate
                     f.print message
                     f.flock(File::LOCK_UN)
                 end
-           end
+            end
         end
     end
 end
