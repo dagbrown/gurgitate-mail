@@ -141,7 +141,7 @@ end
 
 task :webpage => [Tarball,"CHANGELOG","gurgitate-mail.html"] do 
     FileUtils.install(File.join("..",Tarball),Webpage,:mode => 0644)
-    FileUtils.install(File.join("..",Gemfile), Webpage, :mode => 0644)
+    FileUtils.install(Gemfile, Webpage, :mode => 0644)
     FileUtils.install("CHANGELOG",Webpage+"/CHANGELOG.txt", :mode => 0644)
     FileUtils.install("gurgitate-mail.html",Webpage, :mode => 0644)
 end
