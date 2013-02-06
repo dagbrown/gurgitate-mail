@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 require 'rubygems'
 gem 'test-unit'
 require 'test/unit'
@@ -429,3 +430,4 @@ EOF
             "There should be no Lunar Linux mailing list in Cc line")
     end
 end
+

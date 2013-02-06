@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 require 'rubygems'
 gem 'test-unit'
 require 'test/unit'
@@ -32,3 +33,4 @@ if __FILE__ == $0 then
     end
     runtests testcases
 end
+

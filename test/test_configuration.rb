@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 builddir = File.dirname(File.dirname(__FILE__))
 
 unless $:[0] == builddir
@@ -39,3 +40,4 @@ class TC_Configuration < GurgitateTest
         end
     end
 end
+

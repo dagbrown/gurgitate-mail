@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 builddir = File.dirname(File.dirname(__FILE__))
 
 unless $:[0] == builddir
@@ -218,4 +219,5 @@ class TC_Delivery < GurgitateTest
         assert_equal("Subject: test", mess.header("Subject"), "Subject header wrong")
     end
 end
+
 

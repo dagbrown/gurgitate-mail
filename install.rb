@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 #!/usr/bin/ruby -w
 
 require "rbconfig"
@@ -101,3 +102,4 @@ end
 if __FILE__ == $0 then
     Gurgitate::Install.install()
 end
+

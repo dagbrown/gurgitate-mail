@@ -1,4 +1,5 @@
 #!/opt/bin/ruby -w
+# -*- encoding : utf-8 -*-
 
 #------------------------------------------------------------------------
 # Code to handle saving a message to a mailbox (and a framework for detecting

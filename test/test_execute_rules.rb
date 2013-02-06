@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 builddir = File.join(File.dirname(__FILE__),"..")
 
 unless $:[0] == builddir
@@ -41,3 +42,4 @@ class TC_Execute_rules < TC_Rules
         assert File.exists?(@spoolfile)
     end
 end
+

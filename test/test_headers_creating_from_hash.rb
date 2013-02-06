@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 builddir = File.join(File.dirname(__FILE__),"..")
 
 unless $:[0] == builddir
@@ -16,3 +17,4 @@ class TC_Headers_creating_from_hash < TC_Headers_meddling_with_headers
             :subject => "Subject line"
     end
 end
+

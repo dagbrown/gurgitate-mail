@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 #!/opt/bin/ruby -w
 
 #------------------------------------------------------------------------
@@ -27,3 +28,4 @@ if __FILE__ == $0 then
     end
     runtests testcases
 end
+

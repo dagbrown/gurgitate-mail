@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 SCRIPT_LINES__ = {} unless defined? SCRIPT_LINES__
 
 module COVERAGE__
@@ -45,3 +46,4 @@ module COVERAGE__
 
     set_trace_func(COVERAGE__.method(:trace_func).to_proc)
 end
+

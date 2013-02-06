@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 builddir = File.join(File.dirname(__FILE__),"..")
 
 unless $:[0] == builddir
@@ -116,3 +117,4 @@ class TC_Writing < Test::Unit::TestCase
         assert_equal "To: to@test", (mess.headers["To"]).to_s
     end
 end
+

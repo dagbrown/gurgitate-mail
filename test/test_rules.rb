@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 builddir = File.join(File.dirname(__FILE__),"..")
 
 puts builddir
@@ -113,3 +114,4 @@ class TC_ExecuteRules < TC_Rules
         assert File.exists?(@spoolfile)
     end
 end
+

@@ -1,4 +1,5 @@
 #!/opt/bin/ruby -w
+# -*- encoding : utf-8 -*-
 
 #------------------------------------------------------------------------
 # Handles a complete mail message

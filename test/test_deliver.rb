@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 builddir = File.dirname(File.dirname(__FILE__))
 
 unless $:[0] == builddir
@@ -99,3 +100,4 @@ class TC_Deliver < Test::Unit::TestCase
         assert_equal File.read(seq), "unseen: 1\n"
     end
 end
+

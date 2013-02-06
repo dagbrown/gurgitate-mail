@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 # Contains the class Gurgitate::Mailmessage, used to handle the parsing
 # of existing messages and the creation of new messages.
 
