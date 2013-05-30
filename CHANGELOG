@@ -1,3 +1,7 @@
+1.10.9:
+
+- Fixed a source of some exceptions in message-processing.
+
 1.10.8:
 
 - Fixed some more text encoding issues in the input
