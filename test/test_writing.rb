@@ -48,7 +48,7 @@ class TC_Writing < Test::Unit::TestCase
             :to => "test2@test"
         assert_equal "This is a test", mess.body
         assert_equal [ "From: test@test", "To: test2@test" ], 
-            mess.headers.to_s.split(/\n/)
+            mess.headers.to_s.split(/\n/).sort
     end
 
     def test_initialization_headers_body_in_initialization_hash
@@ -57,7 +57,7 @@ class TC_Writing < Test::Unit::TestCase
             :to => "test2@test"
         assert_equal "This is a test", mess.body
         assert_equal [ "From: test@test", "To: test2@test" ], 
-            mess.headers.to_s.split(/\n/)
+            mess.headers.to_s.split(/\n/).sort
     end
 
     def test_creation_round_trip
