@@ -89,8 +89,20 @@ module Gurgitate
             @recipient = recipient
             @sender = sender
 
+            begin
+                # ASCII_8BIT is what Ruby 1.9 and up calls
+                # "binary stream of unknown encoding".
+                #
+                # At least it treats the ASCII characters
+                # as strings, so I can do regex things
+                # with them
+                text.force_encoding(Encoding::ASCII_8BIT)
+            rescue NameError  # Ruby 1.9 and up
+                true
+            end
+
             if text
-                (@headertext,@body)=text.split(/\n\n/,2)
+                (@headertext,@body)=text.split(/\n\n/m,2)
                 @headers=MailHeaders.new(@headertext);
                 Fromregex.match(@headers["From"][0].contents);
                 @from=$+
