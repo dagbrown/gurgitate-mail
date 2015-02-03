@@ -20,11 +20,6 @@
 require 'fileutils'
 require 'rubygems'
 
-begin
-    require "rake/classic_namespace"
-rescue nil
-end
-
 BuildDir = "BUILD"
 
 Package = "gurgitate-mail"
