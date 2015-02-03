@@ -104,7 +104,12 @@ module Gurgitate
             if text
                 (@headertext,@body)=text.split(/\n\n/m,2)
                 @headers=MailHeaders.new(@headertext);
-                Fromregex.match(@headers["From"][0].contents);
+                Fromregex.match(
+                    if @headers["From"] then
+                        @headers["From"][0].contents
+                    else
+                        ""
+                    end);
                 @from=$+
             else
                 super(text)
