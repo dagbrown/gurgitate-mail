@@ -41,7 +41,7 @@ module Gurgitate
                 loop do
                     filename=File.join(dir,sprintf("%.4f.%d_%d.%s",
                                                    time,$$,counter,hostname))
-                    break if not File.exists?(filename)
+                    break if not File.exist?(filename)
                     counter+=1
                 end
                 return filename
