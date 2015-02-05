@@ -70,12 +70,11 @@ task :gem_cleanup do
 end
 
 file Gemfile => [ Gemspec, :gem_install ] do
-    require "rubygems/builder"
     gemspec = eval File.read(Gemspec)
     FileUtils.touch File.join(BuildDir, ".gemtest")
     olddir = Dir.pwd
     chdir BuildDir
-    Gem::Builder.new(gemspec).build
+    system("gem","build",File.join("..",Gemspec))
     FileUtils.mv Gemfile,olddir
     chdir olddir
 end
@@ -157,7 +156,6 @@ end
 
 file "README" => "gurgitate-mail.text" do |t|
     t.sources=[t.prerequisites[0]]
-    Task[t.source].invoke
     FileUtils.cp(t.source, t.name)
 end
 
