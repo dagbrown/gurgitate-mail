@@ -1,3 +1,7 @@
+1.10.10:
+
+- Fixed a warning issued by obsolete Ruby usage in mail delivery
+
 1.10.9:
 
 - Fixed a source of some exceptions in message-processing.
