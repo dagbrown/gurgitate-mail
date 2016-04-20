@@ -14,19 +14,18 @@ spec = Gem::Specification.new do |s|
     EOF
     s.author = "Dave Brown"
     s.email = "gurgitate-mail@dagbrown.com"
-    s.homepage = "http://www.rubyforge.org/projects/gurgitate-mail/"
-    s.rubyforge_project = "gurgitate-mail"
+    s.homepage = "http://www.github.com/dagbrown/gurgitate-mail/"
 
     s.files = Dir.glob("lib/**/*.rb").delete_if { |item| item.include?"CVS" }
     s.files += Dir.glob("test/**/*.rb").delete_if { |item| item.include? "CVS" }
-    s.files += [ ".gemtest", "Rakefile" ]
-
+    s.files += [ '.gemtest', 'Rakefile' ]
     # Load-time details: library and application
     s.require_path = 'lib'                 # Use these for libraries.
 
     s.bindir = "bin"                       # Use these for applications.
     s.executables = ["gurgitate-mail"]
     s.default_executable = "gurgitate-mail"
+    s.license = 'GPL-2.0'
 
     # Documentation and testing.
     s.has_rdoc = true
