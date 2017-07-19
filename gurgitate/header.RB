@@ -58,14 +58,14 @@ module Gurgitate
         end
 
         # Extended header
-        def << (text)
+        def << text
             @contents += "\n" + text
         end
 
         # Matches a header's contents.
         # regex::
         #   The regular expression to match against the header's contents
-        def matches (regex)
+        def matches regex
             if String === regex
                 regex = Regexp.new(Regexp.escape(regex))
             end
