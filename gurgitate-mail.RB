@@ -89,7 +89,7 @@ module Gurgitate
         def self.attr_configparam(*syms)
             syms.each do |sym|
                 class_eval %{
-                    def #{sym} (*vals)
+                    def #{sym} *vals
                         if vals.length == 1
                             @#{sym} = vals[0]
                         elsif vals.length == 0
