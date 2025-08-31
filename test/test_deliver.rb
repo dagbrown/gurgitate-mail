@@ -36,7 +36,7 @@ class TC_Deliver < Test::Unit::TestCase
                                          "..")).realpath.to_s
         @testdir = File.join(currentdir,"test-data")
         @folders = File.join(@testdir,"folders")
-        FileUtils.rmtree @testdir if File.exists? @testdir
+        FileUtils.rmtree @testdir if File.exist? @testdir
         Dir.mkdir @testdir
         Dir.mkdir @folders
 		m = StringIO.new("From: me\nTo: you\nSubject: test\n\nHi.\n")
@@ -58,11 +58,11 @@ class TC_Deliver < Test::Unit::TestCase
         assert true
     end
     
-    def test_basic_delivery
+    def test_basic_deliver
         assert_nothing_raised do
             @deliver_test.save(@spoolfile)
         end
-        assert File.exists?(@spoolfile)
+        assert File.exist?(@spoolfile)
         assert File.file?(@spoolfile)
         assert_equal File.read(@spoolfile), @deliver_test.to_mbox
     end
@@ -72,14 +72,14 @@ class TC_Deliver < Test::Unit::TestCase
         assert_nothing_raised do
             @deliver_test.save(@spoolfile)
         end
-        assert File.exists?(@spoolfile)
+        assert File.exist?(@spoolfile)
         assert File.directory?(@spoolfile)
-        assert File.exists?(File.join(@spoolfile,"cur"))
-        assert File.exists?(File.join(@spoolfile,"new"))
-        assert File.exists?(File.join(@spoolfile,"tmp"))
+        assert File.exist?(File.join(@spoolfile,"cur"))
+        assert File.exist?(File.join(@spoolfile,"new"))
+        assert File.exist?(File.join(@spoolfile,"tmp"))
         contents = Dir[File.join(@spoolfile,"new","*")]
         assert contents.length == 1
-        assert File.exists?(contents[0])
+        assert File.exist?(contents[0])
         assert_equal File.read(contents[0]), @deliver_test.to_s
     end
 
@@ -89,13 +89,13 @@ class TC_Deliver < Test::Unit::TestCase
             @deliver_test.save(@spoolfile)
         end
 
-        assert File.exists?(@spoolfile)
+        assert File.exist?(@spoolfile)
         assert File.directory?(@spoolfile)
         
         mess = File.join(@spoolfile,"1")
         seq  = File.join(@spoolfile,".mh_sequences")
-        assert File.exists?(mess)
-        assert File.exists?(seq)
+        assert File.exist?(mess)
+        assert File.exist?(seq)
         assert_equal File.read(mess), @deliver_test.to_s
         assert_equal File.read(seq), "unseen: 1\n"
     end

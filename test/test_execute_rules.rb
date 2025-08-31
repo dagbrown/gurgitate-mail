@@ -23,7 +23,7 @@ class TC_Execute_rules < TC_Rules
     end
 
     def teardown
-        File.unlink @invalidrules if File.exists? @invalidrules
+        File.unlink @invalidrules if File.exist? @invalidrules
     end
 
     def test_process_default
@@ -34,12 +34,14 @@ class TC_Execute_rules < TC_Rules
     end
 
     def test_process_rules_not_found
+        puts "Spoolfile is: #{@spoolfile}"
+        assert not File.exist? @spoolfile
         @gurgitate.add_rules @rulesfile
         File.unlink @rulesfile
         assert_nothing_raised do 
             @gurgitate.process
         end
-        assert File.exists?(@spoolfile)
+        assert File.exist?(@spoolfile)
     end
 end
 
