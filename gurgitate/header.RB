@@ -17,7 +17,7 @@ module Gurgitate
         # the capitalization of headers.  Sigh.
         def capitalize_words(s)
             return s.split(/-/).map { |w| w.capitalize }.join("-")
-          rescue
+        rescue
             return s
         end
 
