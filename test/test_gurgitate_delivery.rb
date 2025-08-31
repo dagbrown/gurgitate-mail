@@ -18,35 +18,35 @@ require "gurgitate-mail"
 
 class TC_Gurgitate_delivery < GurgitateTest
     def ensure_empty_maildir(dir)
-        assert File.exists?(dir)
+        assert File.exist?(dir)
         assert File.stat(dir).directory?
-        assert File.exists?(File.join(dir, "new"))
+        assert File.exist?(File.join(dir, "new"))
 
         assert_equal 0, Dir[File.join(dir, "new", "*")].length
         assert_equal 0, Dir[File.join(dir, "cur", "*")].length
     end
 
     def ensure_maildir_with_n_messages(dir, n)
-        assert File.exists?(dir)
+        assert File.exist?(dir)
         assert File.stat(dir).directory?
-        assert File.exists?(File.join(dir, "new"))
+        assert File.exist?(File.join(dir, "new"))
         assert File.stat(File.join(dir, "new")).directory?
         assert_equal 0, Dir[File.join(dir, "cur", "*")].length
         assert_equal n, Dir[File.join(dir, "new", "*")].length
     end
 
     def ensure_empty_mhdir(dir)
-        assert File.exists?(dir)
+        assert File.exist?(dir)
         assert File.stat(dir).directory?
 
         assert_equal 0, Dir[File.join(dir, "*")].length
     end
 
     def ensure_mhdir_with_messages(dir, *messages)
-        assert File.exists?(dir)
+        assert File.exist?(dir)
         assert File.stat(dir).directory?
         messages.each do |message|
-            assert File.exists?(File.join(dir, message.to_s))
+            assert File.exist?(File.join(dir, message.to_s))
             assert File.stat(File.join(dir,message.to_s)).file?
         end
     end
@@ -58,7 +58,7 @@ class TC_Gurgitate_delivery < GurgitateTest
         assert_nothing_raised do
             @gurgitate.process { nil }
         end
-        assert File.exists?(@spoolfile)
+        assert File.exist?(@spoolfile)
     end
 
     def test_detect_mbox
@@ -71,7 +71,7 @@ class TC_Gurgitate_delivery < GurgitateTest
             @gurgitate.process { nil }
         end
 
-        assert File.exists?(@spoolfile)
+        assert File.exist?(@spoolfile)
     end
 
     def test_detect_maildir
@@ -82,7 +82,7 @@ class TC_Gurgitate_delivery < GurgitateTest
         end
 
         assert Dir[File.join(@spoolfile,"new","*")].length > 0
-        assert File.exists?(Dir[File.join(@spoolfile,"new","*")][0])
+        assert File.exist?(Dir[File.join(@spoolfile,"new","*")][0])
         FileUtils.rmtree @spoolfile
         teardown
         test_detect_mbox
@@ -96,10 +96,10 @@ class TC_Gurgitate_delivery < GurgitateTest
             @gurgitate.process { nil }
         end
 
-        assert File.exists?(@spoolfile)
+        assert File.exist?(@spoolfile)
         assert File.directory?(@spoolfile)
-        assert File.exists?(File.join(@spoolfile,"1"))
-        assert File.exists?(File.join(@spoolfile,".mh_sequences"))
+        assert File.exist?(File.join(@spoolfile,"1"))
+        assert File.exist?(File.join(@spoolfile,".mh_sequences"))
         FileUtils.rmtree @spoolfile
         teardown
         test_detect_mbox
@@ -114,7 +114,7 @@ class TC_Gurgitate_delivery < GurgitateTest
             end
         end
 
-        assert File.exists?(File.join(@folders, "test"))
+        assert File.exist?(File.join(@folders, "test"))
         assert File.stat(File.join(@folders, "test")).file?
     end
 
@@ -146,7 +146,7 @@ class TC_Gurgitate_delivery < GurgitateTest
         end
 
         ensure_mhdir_with_messages(File.join(@folders,"test"),1)
-        assert File.exists?(File.join(@folders, "test", ".mh_sequences"))
+        assert File.exist?(File.join(@folders, "test", ".mh_sequences"))
         assert File.stat(File.join(@folders, "test", ".mh_sequences")).file?
         assert_equal "unseen: 1\n", 
             File.read(File.join(@folders, "test", ".mh_sequences"))
@@ -183,7 +183,7 @@ class TC_Gurgitate_delivery < GurgitateTest
 
         ensure_mhdir_with_messages(File.join(@folders, "test"), 1, 2)
 
-        assert File.exists?(File.join(@folders, "test", ".mh_sequences"))
+        assert File.exist?(File.join(@folders, "test", ".mh_sequences"))
         assert File.stat(File.join(@folders, "test", ".mh_sequences")).file?
         assert_equal "unseen: 1-2\n", 
             File.read(File.join(@folders, "test", ".mh_sequences"))
@@ -217,7 +217,7 @@ class TC_Gurgitate_delivery < GurgitateTest
         end
 
         ensure_mhdir_with_messages(File.join(@spoolfile,"test"),1)
-        assert File.exists?(File.join(@spoolfile, "test", ".mh_sequences"))
+        assert File.exist?(File.join(@spoolfile, "test", ".mh_sequences"))
         assert File.stat(File.join(@spoolfile, "test",".mh_sequences")).file?
     end
 
@@ -228,8 +228,8 @@ class TC_Gurgitate_delivery < GurgitateTest
             end
         end
 
-        assert File.exists?(@spoolfile)
-        assert !File.exists?("testing")
+        assert File.exist?(@spoolfile)
+        assert !File.exist?("testing")
     end
 
     def test_cannot_save
@@ -254,7 +254,7 @@ class TC_Gurgitate_delivery < GurgitateTest
             end
         end
 
-        assert File.exists?(File.join(@folders, "test"))
+        assert File.exist?(File.join(@folders, "test"))
         assert File.stat(File.join(@folders, "test")).file?
     end
 

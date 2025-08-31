@@ -111,6 +111,7 @@ class TC_ExecuteRules < TC_Rules
         assert_nothing_raised do
             @gurgitate.process
         end
+        puts "spoolfile is #{@spoolfile}"
         assert File.exists?(@spoolfile)
     end
 end

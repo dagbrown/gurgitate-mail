@@ -24,7 +24,7 @@ class GurgitateTest < Test::Unit::TestCase
         @testdir = Dir.mktmpdir
         # @testdir = File.join(currentdir,"test-data")
         @folders = File.join(@testdir,"folders")
-        FileUtils.rmtree @testdir if File.exists? @testdir
+        FileUtils.rmtree @testdir if File.exist? @testdir
         Dir.mkdir @testdir
         Dir.mkdir @folders
 		m = StringIO.new("From: me\nTo: you\nSubject: test\n\nHi.\n")

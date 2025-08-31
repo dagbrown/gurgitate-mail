@@ -24,7 +24,7 @@ class TC_Process < GurgitateTest
         assert_nothing_raised do
             @gurgitate.process { nil }
         end
-        assert File.exists?(@spoolfile)
+        assert File.exist?(@spoolfile)
     end
 
     def test_pipe_raises_no_exceptions
@@ -38,7 +38,7 @@ class TC_Process < GurgitateTest
 			@gurgitate.process { break }
 		end
 
-        assert !File.exists?(@spoolfile)
+        assert !File.exist?(@spoolfile)
     end
 
     def test_message_parsed_correctly
