@@ -303,7 +303,7 @@ module Gurgitate
             IO.popen(program,"w") do |f|
                 f.print(self.to_s)
             end
-            return $?>>8
+            return $?.exitstatus
         end
 
         # Pipes the message through +program+, and returns another
