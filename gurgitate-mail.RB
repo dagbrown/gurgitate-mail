@@ -170,7 +170,7 @@ module Gurgitate
                     maildir spoolfile
                 elsif style[0] == MH then
                     mh_profile_path = File.join(ENV["HOME"],".mh_profile")
-                    if File.exists?(mh_profile_path) then
+                    if File.exist? mh_profile_path then
                         mh_profile = YAML.load(File.read(mh_profile_path))
                         maildir mh_profile["Path"]
                     else

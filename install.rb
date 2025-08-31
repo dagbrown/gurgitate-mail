@@ -30,7 +30,7 @@ module Gurgitate
             include RbConfig
 
             if prefix then
-                if not File.exists? prefix then
+                if not File.exist? prefix then
                     Dir.mkdir prefix
                 end
                 bindir = File.join prefix, "bin"; mkdir bindir
