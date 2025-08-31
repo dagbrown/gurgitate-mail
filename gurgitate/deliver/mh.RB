@@ -25,9 +25,9 @@ module Gurgitate
                     # $HOME/.mh_profile, but Claws-Mail uses MH mailboxes and
                     # disregards $HOME/.mh_profile.
                     if( File.stat(mailbox).directory? and
-                        not ( File.exists?(File.join(mailbox, "cur")) or
-                              File.exists?(File.join(mailbox, "tmp")) or
-                              File.exists?(File.join(mailbox, "new")) ) ) then
+                        not ( File.exist?(File.join(mailbox, "cur")) or
+                              File.exist?(File.join(mailbox, "tmp")) or
+                              File.exist?(File.join(mailbox, "new")) ) ) then
                         return MH
                     end
                 rescue Errno::ENOENT
@@ -42,11 +42,11 @@ module Gurgitate
             #   saves the message to +Maildir+/+mailbox+.  Otherwise,
             #   it simply saves the message to the file +mailbox+.
             def deliver_message mailbox
-                if ! File.exists? mailbox then
+                if ! File.exist? mailbox then
                     Dir.mkdir(mailbox)
                 end
 
-                if File.exists? mailbox and not File.directory? mailbox then
+                if File.exist? mailbox and not File.directory? mailbox then
                     raise SystemError, "not a directory"
                 end
 
