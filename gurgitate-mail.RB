@@ -216,7 +216,7 @@ module Gurgitate
             @folderstyle = MBox
             @rules       = []
 
-            input_text = ""
+            input_text = String.new
             input.each_line do |l| input_text << l end
             super(input_text, recipient, sender)
             instance_eval(&block) if block_given?
