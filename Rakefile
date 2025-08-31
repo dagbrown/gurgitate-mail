@@ -74,7 +74,7 @@ file Gemfile => [ Gemspec, :gem_install ] do
     FileUtils.touch File.join(BuildDir, ".gemtest")
     olddir = Dir.pwd
     chdir BuildDir
-    system("gem","build",File.join("..",Gemspec))
+    system("gem","build",File.join(olddir,Gemspec))
     FileUtils.mv Gemfile,olddir
     chdir olddir
 end
