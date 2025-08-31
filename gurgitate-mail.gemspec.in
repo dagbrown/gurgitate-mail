@@ -4,7 +4,8 @@ spec = Gem::Specification.new do |s|
 
     # Basic information.
     s.name = 'gurgitate-mail'
-    s.version = File.open("VERSION").read.strip
+    STDERR.puts "DEBUG DEBUG DEBUG #{Dir.pwd} DEBUG DEBUG DEBUG"
+    s.version = "@VERSION@"
     s.summary = <<-EOF
     gurgitate-mail is a mail filter (and a mail-delivery agent)
     EOF
@@ -25,7 +26,7 @@ spec = Gem::Specification.new do |s|
     s.bindir = "bin"                       # Use these for applications.
     s.executables = ["gurgitate-mail"]
     s.default_executable = "gurgitate-mail"
-    s.license = 'GPL-2.0'
+    s.license = 'GPL-2.0-or-later'
 
     # Documentation and testing.
     s.has_rdoc = true

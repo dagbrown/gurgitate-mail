@@ -38,11 +38,14 @@ Targets = %w{gurgitate-mail.rb
              gurgitate-mail
              gurgitate-mail.html
              gurgitate-mail.man
+             gurgitate-mail.gemspec
              README} + Modules
 
 Tests = Dir["test/test_*.rb"]
 
 Gemspec = "#{Package}.gemspec"
+
+GemspecIn = "#{Gemspec}.in"
 
 Releasefiles = %w{CHANGELOG INSTALL install.rb} + Targets + Tests
 
@@ -67,6 +70,14 @@ end
 task :gem_cleanup do
     delete_all BuildDir
     delete_all "*.gem"
+end
+
+file Gemspec => GemspecIn do
+  gemspec = File.read GemspecIn
+  gemspec.gsub! "@VERSION@",Version
+  File.open Gemspec, "w" do |fh|
+    fh.write gemspec
+  end
 end
 
 file Gemfile => [ Gemspec, :gem_install ] do
